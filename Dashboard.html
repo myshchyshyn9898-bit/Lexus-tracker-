@@ -151,8 +151,22 @@
 
         <!-- ГРАФІК ЛІЗИНГУ -->
         <div>
-            <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Виплати Лізинг (Стор. 1)</h3>
-            <div class="space-y-3">
+            <div class="flex justify-between items-center mb-3 px-2">
+                <h3 id="leasing-page-title" class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider m-0">Виплати Лізинг (Стор. 1)</h3>
+                
+                <!-- АКУРАТНІ СТРІЛОЧКИ ПАГІНАЦІЇ (Ідеально круглі) -->
+                <div class="flex gap-2">
+                    <button onclick="prevLeasePage()" class="w-8 h-8 bg-white rounded-full modern-shadow flex items-center justify-center border border-gray-100 text-[#1c1c1e] active:scale-95 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <button onclick="nextLeasePage()" class="w-8 h-8 bg-white rounded-full modern-shadow flex items-center justify-center border border-gray-100 text-[#1c1c1e] active:scale-95 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Твій оригінальний список, загорнутий в id="leasing-list", щоб app.js міг його оновлювати -->
+            <div id="leasing-list" class="space-y-3">
                 <div class="bg-white rounded-[24px] p-4 flex justify-between items-center modern-shadow border border-white">
                     <div>
                         <p class="text-[10px] font-extrabold text-[#8e8e93] uppercase tracking-wider mb-1">Тиждень 1</p>
@@ -279,7 +293,7 @@
         </div>
     </div>
 
-    <!-- ПЛАВАЮЧА НАВІГАЦІЯ (Додано onclick на кнопки + і -) -->
+    <!-- ПЛАВАЮЧА НАВІГАЦІЯ -->
     <div class="fixed bottom-6 left-4 right-4 bg-white/85 backdrop-blur-xl rounded-[32px] floating-nav-shadow border border-white/60 px-6 py-3 flex justify-between items-center z-50">
         <a href="Dashboard.html" class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e]">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
@@ -292,7 +306,7 @@
         </div>
 
         <a href="settings.html" class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e] opacity-50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             <span class="text-[10px] font-extrabold">Settings</span>
         </a>
     </div>
