@@ -50,15 +50,15 @@
 
             <div class="relative z-10 flex justify-between items-start mb-5">
                 <div class="bg-white/20 w-12 h-12 rounded-[14px] flex items-center justify-center backdrop-blur-md border border-white/20 shadow-inner">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
                 </div>
                 <div class="bg-white/20 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                    <!-- Додано viewBox сюди -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                     <span class="text-[12px] font-black">+14%</span>
                 </div>
             </div>
 
-            <!-- Додано flex justify-between та items-end для кнопки Архіву -->
             <div class="relative z-10 flex justify-between items-end">
                 <div>
                     <p class="text-[11px] font-extrabold uppercase tracking-[0.15em] text-white/80 mb-1">Чистий Профіт (М/С)</p>
@@ -68,13 +68,13 @@
                     </div>
                 </div>
                 
-                <!-- Акуратна кнопка Закриття місяця -->
-                <button onclick="closeMonth()" class="mb-1 bg-white/20 backdrop-blur-md border border-white/20 text-white w-10 h-10 rounded-[14px] flex items-center justify-center shadow-sm active:scale-95 transition-transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"></path><path d="M1 3h22v5H1z"></path><path d="M10 12h4"></path></svg>
+                <!-- Акуратна кнопка Закриття місяця (ЗМЕНШЕНА І РІВНА) -->
+                <button onclick="closeMonth()" class="mb-1.5 ml-2 bg-white/20 backdrop-blur-md border border-white/20 text-white w-8 h-8 flex-shrink-0 rounded-[10px] flex items-center justify-center shadow-sm active:scale-95 transition-transform">
+                    <!-- Додано viewBox сюди -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"></path><path d="M1 3h22v5H1z"></path><path d="M10 12h4"></path></svg>
                 </button>
             </div>
         </div>
-
 
         <!-- КАРТКА АВТО -->
         <div class="bg-white rounded-[32px] p-2 mb-6 modern-shadow border border-white">
