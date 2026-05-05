@@ -4,10 +4,7 @@ let balances = JSON.parse(localStorage.getItem('lexus_balances')) || {
     work: 1200.00,
     taxi: 450.00,
     comp: 280.00,
-    gas: 280.00,
-    // Дані по автомобілю
-    carTotal: 35000,
-    carPaid: 10000 
+    gas: 280.00
 };
 
 let settings = JSON.parse(localStorage.getItem('lexus_settings')) || {
@@ -17,8 +14,12 @@ let settings = JSON.parse(localStorage.getItem('lexus_settings')) || {
     isMonthlyLease: false // false = Тиждень, true = Місяць
 };
 
-let currentLeasePage = 1; // Поточна сторінка лізингу
-let maxLeasePages = 1;    // Максимальна кількість сторінок
+// Дані по автомобілю (Виніс окремо, щоб вони не кешувалися і ти міг їх легко міняти)
+const CAR_TOTAL = 35000;
+const CAR_PAID = 1000; // <--- ТУТ ТВОЯ 1000!
+
+let currentLeasePage = 1; 
+let maxLeasePages = 1;    
 
 function saveData() {
     localStorage.setItem('lexus_balances', JSON.stringify(balances));
@@ -46,11 +47,11 @@ function renderLeasingList() {
     const titleContainer = document.getElementById('leasing-page-title');
     if (!listContainer) return;
 
-    listContainer.innerHTML = ''; // Очищуємо старі плашки
+    listContainer.innerHTML = ''; 
     titleContainer.innerText = `Виплати Лізинг (Стор. ${currentLeasePage})`;
 
     // Математика залишку
-    const remainingDebt = balances.carTotal - balances.carPaid; // 25 000 zł
+    const remainingDebt = CAR_TOTAL - CAR_PAID; // 34 000 zł
     const stepAmount = settings.isMonthlyLease ? 2400 : 600;
     const periodName = settings.isMonthlyLease ? "Місяць" : "Тиждень";
     
@@ -73,10 +74,10 @@ function renderLeasingList() {
     for (let i = 1; i <= itemsPerPage; i++) {
         const currentNum = startIdx + i;
         
-        // Якщо ми дійшли до кінця виплат — перериваємо цикл, не малюємо зайві
+        // Якщо ми дійшли до кінця виплат — перериваємо цикл
         if (currentNum > totalPaymentsNeeded) break;
 
-        // Рахуємо суму платежу (останній платіж може бути меншим за 600 чи 2400)
+        // Рахуємо суму платежу (останній платіж на залишок)
         let currentAmount = stepAmount;
         if (currentNum === totalPaymentsNeeded) {
             const remainder = remainingDebt % stepAmount;
@@ -107,19 +108,19 @@ function renderLeasingList() {
 }
 
 // Кнопки сторінок лізингу
-function nextLeasePage() {
+window.nextLeasePage = function() {
     if (currentLeasePage < maxLeasePages) {
         currentLeasePage++;
         renderLeasingList();
     }
-}
+};
 
-function prevLeasePage() {
+window.prevLeasePage = function() {
     if (currentLeasePage > 1) {
         currentLeasePage--;
         renderLeasingList();
     }
-}
+};
 
 // === 3. ОНОВЛЕННЯ ІНТЕРФЕЙСУ ===
 
@@ -155,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setupSettingsListeners() {
     const rateHours = document.getElementById('rate-hours');
-    if (!rateHours) return; // Працює тільки на сторінці налаштувань
+    if (!rateHours) return;
 
     rateHours.addEventListener('input', (e) => { settings.hourlyRate = parseFloat(e.target.value) || 0; saveData(); });
     document.getElementById('rate-km').addEventListener('input', (e) => { settings.kmRate = parseFloat(e.target.value) || 0; saveData(); });
@@ -170,7 +171,7 @@ function setupSettingsListeners() {
 
 // === 5. МЕНЮ ТА МАТЕМАТИКА (+) (-) ===
 
-function toggleMenu(menuId) {
+window.toggleMenu = function(menuId) {
     const overlay = document.getElementById('overlay');
     const plusMenu = document.getElementById('plusMenu');
     const minusMenu = document.getElementById('minusMenu');
@@ -183,7 +184,7 @@ function toggleMenu(menuId) {
     if (overlay) overlay.classList.replace('overlay-hidden', 'overlay-visible');
 }
 
-function closeMenus() {
+window.closeMenus = function() {
     const overlay = document.getElementById('overlay');
     const plusMenu = document.getElementById('plusMenu');
     const minusMenu = document.getElementById('minusMenu');
@@ -193,7 +194,7 @@ function closeMenus() {
     if (overlay) overlay.classList.replace('overlay-visible', 'overlay-hidden');
 }
 
-function addIncome(type) {
+window.addIncome = function(type) {
     let inputId, value, addedAmount = 0;
 
     if (type === 'hours') {
@@ -227,7 +228,7 @@ function addIncome(type) {
     }
 }
 
-function addExpense(type) {
+window.addExpense = function(type) {
     let inputId, value, subtractedAmount = 0;
 
     if (type === 'gas') {
