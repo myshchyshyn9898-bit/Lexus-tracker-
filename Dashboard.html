@@ -58,14 +58,23 @@
                 </div>
             </div>
 
-            <div class="relative z-10">
-                <p class="text-[11px] font-extrabold uppercase tracking-[0.15em] text-white/80 mb-1">Чистий Профіт (М/С)</p>
-                <div class="flex items-baseline gap-1">
-                    <h2 id="val-total" class="text-[46px] font-black tracking-tighter text-white leading-none">4 250</h2>
-                    <span class="text-[20px] font-bold text-white/70">.00 zł</span>
+            <!-- Додано flex justify-between та items-end для кнопки Архіву -->
+            <div class="relative z-10 flex justify-between items-end">
+                <div>
+                    <p class="text-[11px] font-extrabold uppercase tracking-[0.15em] text-white/80 mb-1">Чистий Профіт (М/С)</p>
+                    <div class="flex items-baseline gap-1">
+                        <h2 id="val-total" class="text-[46px] font-black tracking-tighter text-white leading-none">4 250</h2>
+                        <span class="text-[20px] font-bold text-white/70">.00 zł</span>
+                    </div>
                 </div>
+                
+                <!-- Акуратна кнопка Закриття місяця -->
+                <button onclick="closeMonth()" class="mb-1 bg-white/20 backdrop-blur-md border border-white/20 text-white w-10 h-10 rounded-[14px] flex items-center justify-center shadow-sm active:scale-95 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"></path><path d="M1 3h22v5H1z"></path><path d="M10 12h4"></path></svg>
+                </button>
             </div>
         </div>
+
 
         <!-- КАРТКА АВТО -->
         <div class="bg-white rounded-[32px] p-2 mb-6 modern-shadow border border-white">
