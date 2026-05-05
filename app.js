@@ -4,17 +4,21 @@ let balances = JSON.parse(localStorage.getItem('lexus_balances')) || {
     work: 1200.00,
     taxi: 450.00,
     comp: 280.00,
-    gas: 280.00
+    gas: 280.00,
+    // Дані по автомобілю
+    carTotal: 35000,
+    carPaid: 10000 
 };
 
 let settings = JSON.parse(localStorage.getItem('lexus_settings')) || {
     hourlyRate: 24,
     kmRate: 0.80,
     gasPrice: 3.80,
-    isMonthlyLease: false
+    isMonthlyLease: false // false = Тиждень, true = Місяць
 };
 
 let currentLeasePage = 1; // Поточна сторінка лізингу
+let maxLeasePages = 1;    // Максимальна кількість сторінок
 
 function saveData() {
     localStorage.setItem('lexus_balances', JSON.stringify(balances));
@@ -25,7 +29,17 @@ function formatMoney(num) {
     return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-// === 2. ЛОГІКА ПАГІНАЦІЇ ЛІЗИНГУ ===
+// Форматування дати з великої літери (напр. "25 Червня")
+function formatDateUa(dateObj) {
+    const formatter = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long' });
+    let parts = formatter.formatToParts(dateObj);
+    let day = parts.find(p => p.type === 'day').value;
+    let month = parts.find(p => p.type === 'month').value;
+    month = month.charAt(0).toUpperCase() + month.slice(1);
+    return `${day} ${month}`;
+}
+
+// === 2. ЛОГІКА І МАТЕМАТИКА ЛІЗИНГУ ===
 
 function renderLeasingList() {
     const listContainer = document.getElementById('leasing-list');
@@ -35,36 +49,55 @@ function renderLeasingList() {
     listContainer.innerHTML = ''; // Очищуємо старі плашки
     titleContainer.innerText = `Виплати Лізинг (Стор. ${currentLeasePage})`;
 
-    const amount = settings.isMonthlyLease ? 2400 : 600;
+    // Математика залишку
+    const remainingDebt = balances.carTotal - balances.carPaid; // 25 000 zł
+    const stepAmount = settings.isMonthlyLease ? 2400 : 600;
     const periodName = settings.isMonthlyLease ? "Місяць" : "Тиждень";
+    
+    // Рахуємо, скільки всього платежів потрібно, щоб закрити борг
+    const totalPaymentsNeeded = Math.ceil(remainingDebt / stepAmount);
+    
+    // Рахуємо, скільки це сторінок (по 4 плашки на сторінку)
+    maxLeasePages = Math.ceil(totalPaymentsNeeded / 4);
+    if (maxLeasePages === 0) maxLeasePages = 1;
+
+    // Запобіжник, якщо сторінка виходить за межі
+    if (currentLeasePage > maxLeasePages) currentLeasePage = maxLeasePages;
+
     const itemsPerPage = 4;
     const startIdx = (currentLeasePage - 1) * itemsPerPage;
+
+    // Базова дата, від якої рахуємо (сьогодні)
+    const baseDate = new Date();
 
     for (let i = 1; i <= itemsPerPage; i++) {
         const currentNum = startIdx + i;
         
-        // Генерація дати (проста логіка: +7 днів або +30 днів від умовної дати)
-        const date = new Date();
-        date.setDate(date.getDate() + (currentNum * (settings.isMonthlyLease ? 30 : 7)));
-        const dateStr = date.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' });
+        // Якщо ми дійшли до кінця виплат — перериваємо цикл, не малюємо зайві
+        if (currentNum > totalPaymentsNeeded) break;
 
-        const isOverdue = currentNum === 1 && currentLeasePage === 1; // Тільки перша плашка "протермінована" для дизайну
+        // Рахуємо суму платежу (останній платіж може бути меншим за 600 чи 2400)
+        let currentAmount = stepAmount;
+        if (currentNum === totalPaymentsNeeded) {
+            const remainder = remainingDebt % stepAmount;
+            if (remainder !== 0) currentAmount = remainder;
+        }
+
+        // Генеруємо дату
+        const date = new Date(baseDate);
+        date.setDate(date.getDate() + (currentNum * (settings.isMonthlyLease ? 30 : 7)));
+        const dateStr = formatDateUa(date);
 
         const html = `
-            <div class="bg-white rounded-[24px] p-4 flex justify-between items-center modern-shadow border ${isOverdue ? 'border-[#ff5252]/20' : 'border-white'}">
+            <div class="bg-white rounded-[24px] p-4 flex justify-between items-center modern-shadow border border-white">
                 <div>
-                    <p class="text-[10px] font-extrabold ${isOverdue ? 'text-[#ff5252]' : 'text-[#8e8e93]'} uppercase tracking-wider mb-1">
-                        ${isOverdue ? 'Протерміновано' : periodName + ' ' + currentNum}
-                    </p>
-                    <p class="text-[20px] font-black ${isOverdue ? 'text-[#ff5252]' : 'text-[#1c1c1e]'}">${formatMoney(amount)} zł</p>
+                    <p class="text-[10px] font-extrabold text-[#8e8e93] uppercase tracking-wider mb-1">${periodName} ${currentNum}</p>
+                    <p class="text-[20px] font-black text-[#1c1c1e]">${formatMoney(currentAmount)} zł</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="${isOverdue ? 'bg-[#fff0f0] text-[#ff5252]' : 'bg-[#f2f4f7] text-[#1c1c1e]'} px-3 py-1.5 rounded-[10px] text-[11px] font-bold">${dateStr}</div>
-                    <div class="${isOverdue ? 'bg-[#ff5252] shadow-red-500/30' : 'bg-[#e2f5ec]'} w-10 h-10 rounded-[12px] flex items-center justify-center">
-                        ${isOverdue 
-                            ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'
-                            : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#20b26c" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>'
-                        }
+                    <div class="bg-[#f2f4f7] text-[#1c1c1e] px-3 py-1.5 rounded-[10px] text-[11px] font-bold">${dateStr}</div>
+                    <div class="bg-[#e2f5ec] w-10 h-10 rounded-[12px] flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#20b26c" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
                 </div>
             </div>
@@ -73,17 +106,20 @@ function renderLeasingList() {
     }
 }
 
-window.nextLeasePage = function() {
-    currentLeasePage++;
-    renderLeasingList();
-};
+// Кнопки сторінок лізингу
+function nextLeasePage() {
+    if (currentLeasePage < maxLeasePages) {
+        currentLeasePage++;
+        renderLeasingList();
+    }
+}
 
-window.prevLeasePage = function() {
+function prevLeasePage() {
     if (currentLeasePage > 1) {
         currentLeasePage--;
         renderLeasingList();
     }
-};
+}
 
 // === 3. ОНОВЛЕННЯ ІНТЕРФЕЙСУ ===
 
@@ -94,7 +130,7 @@ function updateDashboard() {
     document.getElementById('val-taxi').innerText = '+ ' + formatMoney(balances.taxi);
     document.getElementById('val-comp').innerText = '+ ' + formatMoney(balances.comp);
     document.getElementById('val-gas').innerText = '- ' + formatMoney(balances.gas);
-    renderLeasingList();
+    renderLeasingList(); // Малюємо плашки при завантаженні
 }
 
 function updateSettingsUI() {
@@ -119,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setupSettingsListeners() {
     const rateHours = document.getElementById('rate-hours');
-    if (!rateHours) return;
+    if (!rateHours) return; // Працює тільки на сторінці налаштувань
 
     rateHours.addEventListener('input', (e) => { settings.hourlyRate = parseFloat(e.target.value) || 0; saveData(); });
     document.getElementById('rate-km').addEventListener('input', (e) => { settings.kmRate = parseFloat(e.target.value) || 0; saveData(); });
@@ -132,27 +168,32 @@ function setupSettingsListeners() {
     });
 }
 
-// === 5. МЕНЮ ТА МАТЕМАТИКА ===
+// === 5. МЕНЮ ТА МАТЕМАТИКА (+) (-) ===
 
-window.toggleMenu = function(menuId) {
+function toggleMenu(menuId) {
     const overlay = document.getElementById('overlay');
     const plusMenu = document.getElementById('plusMenu');
     const minusMenu = document.getElementById('minusMenu');
 
-    plusMenu.classList.replace('menu-visible', 'menu-hidden');
-    minusMenu.classList.replace('menu-visible', 'menu-hidden');
+    if (plusMenu) plusMenu.classList.replace('menu-visible', 'menu-hidden');
+    if (minusMenu) minusMenu.classList.replace('menu-visible', 'menu-hidden');
     
-    document.getElementById(menuId).classList.replace('menu-hidden', 'menu-visible');
-    overlay.classList.replace('overlay-hidden', 'overlay-visible');
-};
+    const targetMenu = document.getElementById(menuId);
+    if (targetMenu) targetMenu.classList.replace('menu-hidden', 'menu-visible');
+    if (overlay) overlay.classList.replace('overlay-hidden', 'overlay-visible');
+}
 
-window.closeMenus = function() {
-    document.getElementById('plusMenu').classList.replace('menu-visible', 'menu-hidden');
-    document.getElementById('minusMenu').classList.replace('menu-visible', 'menu-hidden');
-    document.getElementById('overlay').classList.replace('overlay-visible', 'overlay-hidden');
-};
+function closeMenus() {
+    const overlay = document.getElementById('overlay');
+    const plusMenu = document.getElementById('plusMenu');
+    const minusMenu = document.getElementById('minusMenu');
 
-window.addIncome = function(type) {
+    if (plusMenu) plusMenu.classList.replace('menu-visible', 'menu-hidden');
+    if (minusMenu) minusMenu.classList.replace('menu-visible', 'menu-hidden');
+    if (overlay) overlay.classList.replace('overlay-visible', 'overlay-hidden');
+}
+
+function addIncome(type) {
     let inputId, value, addedAmount = 0;
 
     if (type === 'hours') {
@@ -184,9 +225,9 @@ window.addIncome = function(type) {
         updateDashboard();
         closeMenus();
     }
-};
+}
 
-window.addExpense = function(type) {
+function addExpense(type) {
     let inputId, value, subtractedAmount = 0;
 
     if (type === 'gas') {
@@ -207,4 +248,4 @@ window.addExpense = function(type) {
         updateDashboard();
         closeMenus();
     }
-};
+}
