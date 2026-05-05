@@ -4,19 +4,18 @@ let balances = JSON.parse(localStorage.getItem('lexus_balances')) || {
     work: 1200.00,
     taxi: 450.00,
     comp: 280.00,
-    gas: 280.00
+    gas: 280.00,
+    // Тепер викуп авто зберігається в пам'яті і росте!
+    carTotal: 35000,
+    carPaid: 1000 
 };
 
 let settings = JSON.parse(localStorage.getItem('lexus_settings')) || {
     hourlyRate: 24,
     kmRate: 0.80,
     gasPrice: 3.80,
-    isMonthlyLease: false // false = Тиждень, true = Місяць
+    isMonthlyLease: false
 };
-
-// Дані по автомобілю (Виніс окремо, щоб вони не кешувалися і ти міг їх легко міняти)
-const CAR_TOTAL = 35000;
-const CAR_PAID = 1000; // <--- ТУТ ТВОЯ 1000!
 
 let currentLeasePage = 1; 
 let maxLeasePages = 1;    
@@ -30,7 +29,6 @@ function formatMoney(num) {
     return num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-// Форматування дати з великої літери (напр. "25 Червня")
 function formatDateUa(dateObj) {
     const formatter = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long' });
     let parts = formatter.formatToParts(dateObj);
@@ -40,7 +38,24 @@ function formatDateUa(dateObj) {
     return `${day} ${month}`;
 }
 
-// === 2. ЛОГІКА І МАТЕМАТИКА ЛІЗИНГУ ===
+// === 2. ЛОГІКА ОПЛАТИ ЛІЗИНГУ ===
+
+window.payInstallment = function(amount) {
+    if (balances.total < amount) {
+        alert("Недостатньо коштів на балансі!");
+        return;
+    }
+
+    if (confirm(`Оплатити ${amount} zł за лізинг?`)) {
+        balances.total -= amount;    // Списуємо з профіту
+        balances.carPaid += amount; // Додаємо до викупу авто
+        saveData();
+        updateDashboard();
+        // Анімація успіху (можна додати звук пізніше)
+    }
+};
+
+// === 3. РЕНДЕР ГРАФІКА ЛІЗИНГУ ===
 
 function renderLeasingList() {
     const listContainer = document.getElementById('leasing-list');
@@ -50,50 +65,48 @@ function renderLeasingList() {
     listContainer.innerHTML = ''; 
     titleContainer.innerText = `Виплати Лізинг (Стор. ${currentLeasePage})`;
 
-    // Математика залишку
-    const remainingDebt = CAR_TOTAL - CAR_PAID; // 34 000 zł
+    const remainingDebt = balances.carTotal - balances.carPaid;
     const stepAmount = settings.isMonthlyLease ? 2400 : 600;
     const periodName = settings.isMonthlyLease ? "Місяць" : "Тиждень";
     
-    // Рахуємо, скільки всього платежів потрібно, щоб закрити борг
     const totalPaymentsNeeded = Math.ceil(remainingDebt / stepAmount);
-    
-    // Рахуємо, скільки це сторінок (по 4 плашки на сторінку)
     maxLeasePages = Math.ceil(totalPaymentsNeeded / 4);
     if (maxLeasePages === 0) maxLeasePages = 1;
-
-    // Запобіжник, якщо сторінка виходить за межі
     if (currentLeasePage > maxLeasePages) currentLeasePage = maxLeasePages;
 
     const itemsPerPage = 4;
     const startIdx = (currentLeasePage - 1) * itemsPerPage;
-
-    // Базова дата, від якої рахуємо (сьогодні)
     const baseDate = new Date();
 
     for (let i = 1; i <= itemsPerPage; i++) {
         const currentNum = startIdx + i;
-        
-        // Якщо ми дійшли до кінця виплат — перериваємо цикл
         if (currentNum > totalPaymentsNeeded) break;
 
-        // Рахуємо суму платежу (останній платіж на залишок)
         let currentAmount = stepAmount;
         if (currentNum === totalPaymentsNeeded) {
             const remainder = remainingDebt % stepAmount;
             if (remainder !== 0) currentAmount = remainder;
         }
 
-        // Генеруємо дату
         const date = new Date(baseDate);
         date.setDate(date.getDate() + (currentNum * (settings.isMonthlyLease ? 30 : 7)));
         const dateStr = formatDateUa(date);
+
+        // КНОПКА "ОПЛАТИТИ" ТІЛЬКИ ДЛЯ ПЕРШОГО ПЛАТЕЖУ НА ПЕРШІЙ СТОРІНЦІ
+        const showPayButton = (currentNum === 1 && currentLeasePage === 1);
 
         const html = `
             <div class="bg-white rounded-[24px] p-4 flex justify-between items-center modern-shadow border border-white">
                 <div>
                     <p class="text-[10px] font-extrabold text-[#8e8e93] uppercase tracking-wider mb-1">${periodName} ${currentNum}</p>
-                    <p class="text-[20px] font-black text-[#1c1c1e]">${formatMoney(currentAmount)} zł</p>
+                    <div class="flex items-center gap-3">
+                        <p class="text-[20px] font-black text-[#1c1c1e]">${formatMoney(currentAmount)} zł</p>
+                        ${showPayButton ? `
+                            <button onclick="payInstallment(${currentAmount})" class="bg-[#ff5252] text-white text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-tighter active:scale-90 transition-transform shadow-md shadow-red-500/20">
+                                Оплатити
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="bg-[#f2f4f7] text-[#1c1c1e] px-3 py-1.5 rounded-[10px] text-[11px] font-bold">${dateStr}</div>
@@ -107,31 +120,29 @@ function renderLeasingList() {
     }
 }
 
-// Кнопки сторінок лізингу
-window.nextLeasePage = function() {
-    if (currentLeasePage < maxLeasePages) {
-        currentLeasePage++;
-        renderLeasingList();
-    }
-};
+window.nextLeasePage = function() { if (currentLeasePage < maxLeasePages) { currentLeasePage++; renderLeasingList(); } };
+window.prevLeasePage = function() { if (currentLeasePage > 1) { currentLeasePage--; renderLeasingList(); } };
 
-window.prevLeasePage = function() {
-    if (currentLeasePage > 1) {
-        currentLeasePage--;
-        renderLeasingList();
-    }
-};
-
-// === 3. ОНОВЛЕННЯ ІНТЕРФЕЙСУ ===
+// === 4. ОНОВЛЕННЯ ВСЬОГО ІНТЕРФЕЙСУ ===
 
 function updateDashboard() {
     if (!document.getElementById('val-total')) return;
+
+    // 1. Гроші на плитках
     document.getElementById('val-total').innerText = formatMoney(balances.total) + '.00 zł';
     document.getElementById('val-work').innerText = '+ ' + formatMoney(balances.work);
     document.getElementById('val-taxi').innerText = '+ ' + formatMoney(balances.taxi);
     document.getElementById('val-comp').innerText = '+ ' + formatMoney(balances.comp);
     document.getElementById('val-gas').innerText = '- ' + formatMoney(balances.gas);
-    renderLeasingList(); // Малюємо плашки при завантаженні
+
+    // 2. Прогрес-бар авто
+    const percent = Math.round((balances.carPaid / balances.carTotal) * 100);
+    document.getElementById('car-paid-text').innerText = formatMoney(balances.carPaid);
+    document.getElementById('car-total-text').innerText = `/ ${formatMoney(balances.carTotal / 1000)}k zł`;
+    document.getElementById('car-percent-badge').innerText = percent + '%';
+    document.getElementById('car-progress-bar').style.width = percent + '%';
+
+    renderLeasingList();
 }
 
 function updateSettingsUI() {
@@ -149,104 +160,62 @@ function updateSettingsUI() {
 document.addEventListener('DOMContentLoaded', () => {
     updateDashboard();
     updateSettingsUI();
-    setupSettingsListeners();
+    
+    // Слухачі в налаштуваннях
+    if (document.getElementById('rate-hours')) {
+        document.getElementById('rate-hours').addEventListener('input', (e) => { settings.hourlyRate = parseFloat(e.target.value) || 0; saveData(); });
+        document.getElementById('rate-km').addEventListener('input', (e) => { settings.kmRate = parseFloat(e.target.value) || 0; saveData(); });
+        document.getElementById('rate-gas').addEventListener('input', (e) => { settings.gasPrice = parseFloat(e.target.value) || 0; saveData(); });
+        document.getElementById('leasing-toggle').addEventListener('change', (e) => {
+            settings.isMonthlyLease = e.target.checked;
+            document.getElementById('leasing-desc').innerText = settings.isMonthlyLease ? "Місячно: 2400 zł / міс." : "Тижнево: 600 zł / тиж.";
+            saveData();
+            updateDashboard();
+        });
+    }
 });
-
-// === 4. СЛУХАЧІ В НАЛАШТУВАННЯХ ===
-
-function setupSettingsListeners() {
-    const rateHours = document.getElementById('rate-hours');
-    if (!rateHours) return;
-
-    rateHours.addEventListener('input', (e) => { settings.hourlyRate = parseFloat(e.target.value) || 0; saveData(); });
-    document.getElementById('rate-km').addEventListener('input', (e) => { settings.kmRate = parseFloat(e.target.value) || 0; saveData(); });
-    document.getElementById('rate-gas').addEventListener('input', (e) => { settings.gasPrice = parseFloat(e.target.value) || 0; saveData(); });
-
-    document.getElementById('leasing-toggle').addEventListener('change', (e) => {
-        settings.isMonthlyLease = e.target.checked;
-        document.getElementById('leasing-desc').innerText = settings.isMonthlyLease ? "Місячно: 2400 zł / міс." : "Тижнево: 600 zł / тиж.";
-        saveData();
-    });
-}
 
 // === 5. МЕНЮ ТА МАТЕМАТИКА (+) (-) ===
 
 window.toggleMenu = function(menuId) {
-    const overlay = document.getElementById('overlay');
-    const plusMenu = document.getElementById('plusMenu');
-    const minusMenu = document.getElementById('minusMenu');
-
-    if (plusMenu) plusMenu.classList.replace('menu-visible', 'menu-hidden');
-    if (minusMenu) minusMenu.classList.replace('menu-visible', 'menu-hidden');
-    
-    const targetMenu = document.getElementById(menuId);
-    if (targetMenu) targetMenu.classList.replace('menu-hidden', 'menu-visible');
-    if (overlay) overlay.classList.replace('overlay-hidden', 'overlay-visible');
+    document.getElementById('plusMenu').classList.replace('menu-visible', 'menu-hidden');
+    document.getElementById('minusMenu').classList.replace('menu-visible', 'menu-hidden');
+    document.getElementById(menuId).classList.replace('menu-hidden', 'menu-visible');
+    document.getElementById('overlay').classList.replace('overlay-hidden', 'overlay-visible');
 }
 
 window.closeMenus = function() {
-    const overlay = document.getElementById('overlay');
-    const plusMenu = document.getElementById('plusMenu');
-    const minusMenu = document.getElementById('minusMenu');
-
-    if (plusMenu) plusMenu.classList.replace('menu-visible', 'menu-hidden');
-    if (minusMenu) minusMenu.classList.replace('menu-visible', 'menu-hidden');
-    if (overlay) overlay.classList.replace('overlay-visible', 'overlay-hidden');
+    document.getElementById('plusMenu').classList.replace('menu-visible', 'menu-hidden');
+    document.getElementById('minusMenu').classList.replace('menu-visible', 'menu-hidden');
+    document.getElementById('overlay').classList.replace('overlay-visible', 'overlay-hidden');
 }
 
 window.addIncome = function(type) {
-    let inputId, value, addedAmount = 0;
-
-    if (type === 'hours') {
-        inputId = 'input-hours';
-        value = parseFloat(document.getElementById(inputId).value);
-        if (value) addedAmount = value * settings.hourlyRate;
-    } else if (type === 'km') {
-        inputId = 'input-km';
-        value = parseFloat(document.getElementById(inputId).value);
-        if (value) addedAmount = value * settings.kmRate;
-    } else if (type === 'taxi') {
-        inputId = 'input-taxi';
-        value = parseFloat(document.getElementById(inputId).value);
-        if (value) addedAmount = value;
-    } else if (type === 'other') {
-        inputId = 'input-other-plus';
-        value = parseFloat(document.getElementById(inputId).value);
-        if (value) addedAmount = value;
-    }
+    let inputId, addedAmount = 0;
+    if (type === 'hours') { inputId = 'input-hours'; let v = parseFloat(document.getElementById(inputId).value); if (v) addedAmount = v * settings.hourlyRate; }
+    else if (type === 'km') { inputId = 'input-km'; let v = parseFloat(document.getElementById(inputId).value); if (v) addedAmount = v * settings.kmRate; }
+    else if (type === 'taxi') { inputId = 'input-taxi'; let v = parseFloat(document.getElementById(inputId).value); if (v) addedAmount = v; }
+    else if (type === 'other') { inputId = 'input-other-plus'; let v = parseFloat(document.getElementById(inputId).value); if (v) addedAmount = v; }
 
     if (addedAmount > 0) {
         balances.total += addedAmount;
         if (type === 'hours' || type === 'other') balances.work += addedAmount;
         if (type === 'km') balances.comp += addedAmount;
         if (type === 'taxi') balances.taxi += addedAmount;
-        
         document.getElementById(inputId).value = '';
-        saveData();
-        updateDashboard();
-        closeMenus();
+        saveData(); updateDashboard(); closeMenus();
     }
 }
 
 window.addExpense = function(type) {
-    let inputId, value, subtractedAmount = 0;
-
-    if (type === 'gas') {
-        inputId = 'input-gas-liters';
-        value = parseFloat(document.getElementById(inputId).value);
-        if (value) subtractedAmount = value * settings.gasPrice;
-    } else if (type === 'other') {
-        inputId = 'input-other-minus';
-        value = parseFloat(document.getElementById(inputId).value);
-        if (value) subtractedAmount = value;
-    }
+    let inputId, subtractedAmount = 0;
+    if (type === 'gas') { inputId = 'input-gas-liters'; let v = parseFloat(document.getElementById(inputId).value); if (v) subtractedAmount = v * settings.gasPrice; }
+    else if (type === 'other') { inputId = 'input-other-minus'; let v = parseFloat(document.getElementById(inputId).value); if (v) subtractedAmount = v; }
 
     if (subtractedAmount > 0) {
         balances.total -= subtractedAmount;
         balances.gas += subtractedAmount;
         document.getElementById(inputId).value = '';
-        saveData();
-        updateDashboard();
-        closeMenus();
+        saveData(); updateDashboard(); closeMenus();
     }
 }
