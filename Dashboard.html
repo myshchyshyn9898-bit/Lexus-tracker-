@@ -61,7 +61,7 @@
             <div class="relative z-10">
                 <p class="text-[11px] font-extrabold uppercase tracking-[0.15em] text-white/80 mb-1">Чистий Профіт (М/С)</p>
                 <div class="flex items-baseline gap-1">
-                    <h2 class="text-[46px] font-black tracking-tighter text-white leading-none">4 250</h2>
+                    <h2 id="val-total" class="text-[46px] font-black tracking-tighter text-white leading-none">4 250</h2>
                     <span class="text-[20px] font-bold text-white/70">.00 zł</span>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                     <span class="text-[11px] font-black text-[#8e8e93] uppercase tracking-wider">Робота</span>
                 </div>
                 <div>
-                    <div class="text-[28px] font-black text-[#20b26c] tracking-tight leading-none mb-1">+ 1 200</div>
+                    <div id="val-work" class="text-[28px] font-black text-[#20b26c] tracking-tight leading-none mb-1">+ 1 200</div>
                     <div class="text-[11px] font-extrabold text-[#8e8e93] uppercase tracking-widest">PLN</div>
                 </div>
             </div>
@@ -117,7 +117,7 @@
                     <span class="text-[11px] font-black text-[#8e8e93] uppercase tracking-wider">Таксі</span>
                 </div>
                 <div>
-                    <div class="text-[28px] font-black text-[#20b26c] tracking-tight leading-none mb-1">+ 450</div>
+                    <div id="val-taxi" class="text-[28px] font-black text-[#20b26c] tracking-tight leading-none mb-1">+ 450</div>
                     <div class="text-[11px] font-extrabold text-[#8e8e93] uppercase tracking-widest">PLN</div>
                 </div>
             </div>
@@ -130,7 +130,7 @@
                     <span class="text-[11px] font-black text-[#8e8e93] uppercase tracking-wider">Комп. П.</span>
                 </div>
                 <div>
-                    <div class="text-[28px] font-black text-[#20b26c] tracking-tight leading-none mb-1">+ 280</div>
+                    <div id="val-comp" class="text-[28px] font-black text-[#20b26c] tracking-tight leading-none mb-1">+ 280</div>
                     <div class="text-[11px] font-extrabold text-[#8e8e93] uppercase tracking-widest">PLN</div>
                 </div>
             </div>
@@ -143,7 +143,7 @@
                     <span class="text-[11px] font-black text-[#8e8e93] uppercase tracking-wider">Газ</span>
                 </div>
                 <div>
-                    <div class="text-[28px] font-black text-[#ff5252] tracking-tight leading-none mb-1">- 280</div>
+                    <div id="val-gas" class="text-[28px] font-black text-[#ff5252] tracking-tight leading-none mb-1">- 280</div>
                     <div class="text-[11px] font-extrabold text-[#8e8e93] uppercase tracking-widest">PLN</div>
                 </div>
             </div>
@@ -194,9 +194,9 @@
                 </div>
                 <div class="flex-1">
                     <div class="text-[10px] font-bold text-[#8e8e93] uppercase tracking-wider">Зарплата (Години)</div>
-                    <input type="number" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0">
+                    <input type="number" id="input-hours" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0">
                 </div>
-                <button onclick="closeMenus()" class="w-10 h-10 bg-[#20b26c] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-green-500/30">
+                <button onclick="addIncome('hours')" class="w-10 h-10 bg-[#20b26c] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-green-500/30">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </button>
             </div>
@@ -208,9 +208,9 @@
                 </div>
                 <div class="flex-1">
                     <div class="text-[10px] font-bold text-[#8e8e93] uppercase tracking-wider">Кілометраж (Км)</div>
-                    <input type="number" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0">
+                    <input type="number" id="input-km" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0">
                 </div>
-                <button onclick="closeMenus()" class="w-10 h-10 bg-[#20b26c] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-green-500/30">
+                <button onclick="addIncome('km')" class="w-10 h-10 bg-[#20b26c] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-green-500/30">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </button>
             </div>
@@ -222,9 +222,9 @@
                 </div>
                 <div class="flex-1">
                     <div class="text-[10px] font-bold text-[#8e8e93] uppercase tracking-wider">Таксі (Сума чистими)</div>
-                    <input type="number" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0 zł">
+                    <input type="number" id="input-taxi" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0 zł">
                 </div>
-                <button onclick="closeMenus()" class="w-10 h-10 bg-[#20b26c] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-green-500/30">
+                <button onclick="addIncome('taxi')" class="w-10 h-10 bg-[#20b26c] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-green-500/30">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </button>
             </div>
@@ -236,9 +236,9 @@
                 </div>
                 <div class="flex-1">
                     <div class="text-[10px] font-bold text-[#8e8e93] uppercase tracking-wider">Інше (Додати до ЗП)</div>
-                    <input type="number" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0 zł">
+                    <input type="number" id="input-other-plus" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0 zł">
                 </div>
-                <button onclick="closeMenus()" class="w-10 h-10 bg-[#20b26c] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-green-500/30">
+                <button onclick="addIncome('other')" class="w-10 h-10 bg-[#20b26c] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-green-500/30">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </button>
             </div>
@@ -256,9 +256,9 @@
                 </div>
                 <div class="flex-1">
                     <div class="text-[10px] font-bold text-[#ff5252] uppercase tracking-wider">Заправка (Літри)</div>
-                    <input type="number" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0 л">
+                    <input type="number" id="input-gas-liters" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0 л">
                 </div>
-                <button onclick="closeMenus()" class="w-10 h-10 bg-[#ff5252] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-red-500/30">
+                <button onclick="addExpense('gas')" class="w-10 h-10 bg-[#ff5252] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-red-500/30">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </button>
             </div>
@@ -270,9 +270,9 @@
                 </div>
                 <div class="flex-1">
                     <div class="text-[10px] font-bold text-[#ff5252] uppercase tracking-wider">Інше (Списати з Газу)</div>
-                    <input type="number" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0 zł">
+                    <input type="number" id="input-other-minus" class="w-full bg-transparent font-black text-[18px] text-[#1c1c1e] outline-none mt-0.5" placeholder="0 zł">
                 </div>
-                <button onclick="closeMenus()" class="w-10 h-10 bg-[#ff5252] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-red-500/30">
+                <button onclick="addExpense('other')" class="w-10 h-10 bg-[#ff5252] text-white rounded-[14px] flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-red-500/30">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </button>
             </div>
@@ -281,43 +281,24 @@
 
     <!-- ПЛАВАЮЧА НАВІГАЦІЯ (Додано onclick на кнопки + і -) -->
     <div class="fixed bottom-6 left-4 right-4 bg-white/85 backdrop-blur-xl rounded-[32px] floating-nav-shadow border border-white/60 px-6 py-3 flex justify-between items-center z-50">
-        <button class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e]">
+        <a href="Dashboard.html" class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e]">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
             <span class="text-[10px] font-extrabold">Home</span>
-        </button>
+        </a>
 
         <div class="flex gap-3">
             <button onclick="toggleMenu('minusMenu')" class="w-12 h-12 bg-[#fff0f0] text-[#ff5252] rounded-[18px] flex items-center justify-center text-3xl font-bold active:scale-95 transition-transform">-</button>
             <button onclick="toggleMenu('plusMenu')" class="w-12 h-12 bg-[#ff5252] text-white rounded-[18px] flex items-center justify-center text-3xl font-bold shadow-lg shadow-red-500/40 active:scale-95 transition-transform">+</button>
         </div>
 
-        <button class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e] opacity-50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <a href="settings.html" class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e] opacity-50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             <span class="text-[10px] font-extrabold">Settings</span>
-        </button>
+        </a>
     </div>
 
-    <!-- ТІЛЬКИ ВІЗУАЛЬНИЙ СКРИПТ (БЕЗ МАТЕМАТИКИ) -->
-    <script>
-        const overlay = document.getElementById('overlay');
-        const plusMenu = document.getElementById('plusMenu');
-        const minusMenu = document.getElementById('minusMenu');
-
-        function toggleMenu(menuId) {
-            plusMenu.classList.replace('menu-visible', 'menu-hidden');
-            minusMenu.classList.replace('menu-visible', 'menu-hidden');
-            
-            const targetMenu = document.getElementById(menuId);
-            targetMenu.classList.replace('menu-hidden', 'menu-visible');
-            overlay.classList.replace('overlay-hidden', 'overlay-visible');
-        }
-
-        function closeMenus() {
-            plusMenu.classList.replace('menu-visible', 'menu-hidden');
-            minusMenu.classList.replace('menu-visible', 'menu-hidden');
-            overlay.classList.replace('overlay-visible', 'overlay-hidden');
-        }
-    </script>
+    <!-- ПІДКЛЮЧАЄМО СПІЛЬНИЙ БЕКЕНД/ЛОГІКУ -->
+    <script src="app.js"></script>
 
 </body>
 </html>
