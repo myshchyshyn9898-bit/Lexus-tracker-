@@ -123,7 +123,52 @@ function renderLeasingList() {
 window.nextLeasePage = function() { if (currentLeasePage < maxLeasePages) { currentLeasePage++; renderLeasingList(); } };
 window.prevLeasePage = function() { if (currentLeasePage > 1) { currentLeasePage--; renderLeasingList(); } };
 
-// === 4. ОНОВЛЕННЯ ВСЬОГО ІНТЕРФЕЙСУ ===
+// === 4. РЕНДЕР АРХІВУ (ХІРУРГІЧНО ДОДАНО) ===
+
+function renderArchive() {
+    const container = document.getElementById('archive-list');
+    if (!container) return; // Працює тільки на сторінці archive.html
+
+    const archive = JSON.parse(localStorage.getItem('lexus_archive')) || [];
+    container.innerHTML = '';
+
+    if (archive.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-10">
+                <p class="text-[14px] font-bold text-[#8e8e93]">Архів поки що порожній.</p>
+                <p class="text-[12px] font-bold text-[#8e8e93]/70 mt-1">Закрийте поточний місяць, щоб він з'явився тут.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Показуємо найновіші записи зверху
+    [...archive].reverse().forEach(record => {
+        const html = `
+            <div class="bg-white rounded-[28px] p-5 modern-shadow border border-white">
+                <div class="flex justify-between items-end mb-4">
+                    <h3 class="text-[16px] font-black text-[#1c1c1e] capitalize">${record.date}</h3>
+                    <div class="bg-[#20b26c]/10 text-[#20b26c] px-3 py-1 rounded-[10px] text-[13px] font-black">
+                        + ${formatMoney(record.total)} zł
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="text-[10px] font-extrabold text-[#8e8e93] uppercase tracking-wider mb-0.5">Робота + Таксі</p>
+                        <p class="text-[14px] font-bold text-[#1c1c1e]">${formatMoney(record.work + record.taxi)} zł</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-extrabold text-[#8e8e93] uppercase tracking-wider mb-0.5">Витрати (Газ)</p>
+                        <p class="text-[14px] font-bold text-[#ff5252]">- ${formatMoney(record.gas)} zł</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    });
+}
+
+// === 5. ОНОВЛЕННЯ ВСЬОГО ІНТЕРФЕЙСУ ===
 
 function updateDashboard() {
     if (!document.getElementById('val-total')) return;
@@ -160,6 +205,7 @@ function updateSettingsUI() {
 document.addEventListener('DOMContentLoaded', () => {
     updateDashboard();
     updateSettingsUI();
+    renderArchive(); // Виклик функції рендеру архіву
     
     // Слухачі в налаштуваннях
     if (document.getElementById('rate-hours')) {
@@ -175,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// === 5. МЕНЮ ТА МАТЕМАТИКА (+) (-) ===
+// === 6. МЕНЮ ТА МАТЕМАТИКА (+) (-) ===
 
 window.toggleMenu = function(menuId) {
     document.getElementById('plusMenu').classList.replace('menu-visible', 'menu-hidden');
@@ -220,7 +266,7 @@ window.addExpense = function(type) {
     }
 }
 
-// === 6. ЗАКРИТТЯ МІСЯЦЯ (АРХІВ) ===
+// === 7. ЗАКРИТТЯ МІСЯЦЯ (АРХІВ) ===
 
 window.closeMonth = function() {
     if (balances.total === 0 && balances.work === 0 && balances.taxi === 0) {
