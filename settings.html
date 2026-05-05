@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexus Tracker PRO - Налаштування</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .modern-shadow { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05); }
+        .floating-nav-shadow { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12); }
+        
+        /* Стиль для кастомного перемикача (Toggle) */
+        .toggle-checkbox:checked { right: 0; border-color: #20b26c; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #20b26c; }
+        .toggle-checkbox { right: 4px; z-index: 1; border-color: #e5e7eb; transition: all 0.3s; }
+        .toggle-label { background-color: #e5e7eb; transition: all 0.3s; }
+    </style>
+</head>
+<body class="bg-[#f4f5f8] min-h-screen text-[#1c1c1e] pb-40">
+
+    <div class="px-4 pt-4">
+        
+        <!-- ШАПКА -->
+        <div class="flex items-center gap-2 mb-8 pt-2">
+            <h1 class="text-[26px] font-black tracking-tight text-[#1c1c1e]">Налаштування</h1>
+        </div>
+
+        <!-- 1. АВТОМОБІЛЬ (Фото) -->
+        <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Автомобіль</h3>
+        <div class="bg-white rounded-[24px] p-5 mb-6 modern-shadow border border-white flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <!-- Мініатюра поточного фото -->
+                <div class="w-16 h-16 rounded-[14px] bg-gray-200 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=200&auto=format&fit=crop" alt="Lexus" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <p class="font-black text-[16px]">Lexus CT200h</p>
+                    <p class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Змінити обкладинку</p>
+                </div>
+            </div>
+            <!-- Кнопка завантаження -->
+            <button class="bg-[#f2f4f7] text-[#1c1c1e] w-10 h-10 rounded-[12px] flex items-center justify-center active:scale-95 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            </button>
+        </div>
+
+        <!-- 2. ТАРИФИ ТА ЦІНИ -->
+        <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Тарифи та Ставки</h3>
+        <div class="bg-white rounded-[24px] p-5 mb-6 modern-shadow border border-white space-y-5">
+            
+            <!-- Ставка за годину -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-[#f0f4ff] w-10 h-10 rounded-[12px] flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#4285f4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    </div>
+                    <div>
+                        <p class="font-black text-[14px]">Ставка ЗП (Робота)</p>
+                        <p class="text-[10px] font-bold text-[#8e8e93] uppercase tracking-wider">за 1 годину</p>
+                    </div>
+                </div>
+                <div class="flex items-center bg-[#f2f4f7] rounded-[14px] px-3 py-2">
+                    <input type="number" value="24" class="w-10 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
+                    <span class="text-[12px] font-bold text-[#8e8e93] ml-1">zł</span>
+                </div>
+            </div>
+
+            <!-- Компенсація кілометражу -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-[#e2f5ec] w-10 h-10 rounded-[12px] flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#20b26c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22h12M5 22V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v18M15 8h5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5M19 8v9M10 12v.01"></path></svg>
+                    </div>
+                    <div>
+                        <p class="font-black text-[14px]">Компенсація ПММ</p>
+                        <p class="text-[10px] font-bold text-[#8e8e93] uppercase tracking-wider">за 1 км</p>
+                    </div>
+                </div>
+                <div class="flex items-center bg-[#f2f4f7] rounded-[14px] px-3 py-2">
+                    <input type="number" value="0.80" step="0.1" class="w-12 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
+                    <span class="text-[12px] font-bold text-[#8e8e93] ml-1">zł</span>
+                </div>
+            </div>
+
+            <!-- Ціна Газу -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-[#fff0f0] w-10 h-10 rounded-[12px] flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#ff5252" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="font-black text-[14px]">Ціна Газу (LPG)</p>
+                        <p class="text-[10px] font-bold text-[#8e8e93] uppercase tracking-wider">за 1 літр</p>
+                    </div>
+                </div>
+                <div class="flex items-center bg-[#f2f4f7] rounded-[14px] px-3 py-2">
+                    <input type="number" value="3.80" step="0.1" class="w-12 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
+                    <span class="text-[12px] font-bold text-[#8e8e93] ml-1">zł</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ЛІЗИНГ (Перемикач графіка) -->
+        <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Графік Лізингу</h3>
+        <div class="bg-white rounded-[24px] p-5 mb-6 modern-shadow border border-white">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="font-black text-[16px]">Режим оплати</p>
+                    <p id="leasing-desc" class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Тижнево: 600 zł / тиж.</p>
+                </div>
+                
+                <!-- Перемикач (iOS style toggle) -->
+                <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                    <input type="checkbox" name="toggle" id="leasing-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                    <label for="leasing-toggle" class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer"></label>
+                </div>
+            </div>
+            
+            <div class="bg-[#fff8e6] text-[#fbbc04] p-3 rounded-[16px] flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" class="mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <p class="text-[11px] font-bold">Зміна режиму перерахує всі майбутні платежі на головному екрані (2400 zł/міс).</p>
+            </div>
+        </div>
+
+        <!-- 4. АРХІВ ТА ДАНІ -->
+        <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Дані</h3>
+        <div class="space-y-3">
+            <!-- Кнопка Архіву -->
+            <button class="w-full bg-white rounded-[24px] p-5 modern-shadow border border-white flex items-center justify-between active:scale-95 transition-transform">
+                <div class="flex items-center gap-3">
+                    <div class="bg-[#f2f4f7] w-10 h-10 rounded-[12px] flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#1c1c1e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"></path><path d="M1 3h22v5H1z"></path><path d="M10 12h4"></path></svg>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-black text-[16px]">Архів звітів</p>
+                        <p class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Попередні місяці</p>
+                    </div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#8e8e93" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ПЛАВАЮЧА НАВІГАЦІЯ (Settings активний) -->
+    <div class="fixed bottom-6 left-4 right-4 bg-white/85 backdrop-blur-xl rounded-[32px] floating-nav-shadow border border-white/60 px-6 py-3 flex justify-between items-center z-50">
+        
+        <!-- Home (Тепер напівпрозорий, бо ми в налаштуваннях) -->
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e] opacity-40 active:scale-95 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+            <span class="text-[10px] font-extrabold">Home</span>
+        </a>
+
+        <!-- Кнопки - та + (Тут вони можуть бути вимкнені або повертати на головну) -->
+        <div class="flex gap-3 opacity-50 grayscale pointer-events-none">
+            <div class="w-12 h-12 bg-[#fff0f0] text-[#ff5252] rounded-[18px] flex items-center justify-center text-3xl font-bold">-</div>
+            <div class="w-12 h-12 bg-[#ff5252] text-white rounded-[18px] flex items-center justify-center text-3xl font-bold">+</div>
+        </div>
+
+        <!-- Settings (Тепер АКТИВНИЙ, без opacity) -->
+        <div class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span class="text-[10px] font-extrabold text-[#1c1c1e]">Settings</span>
+        </div>
+    </div>
+
+    <!-- Мінімальний візуальний скрипт для перемикача -->
+    <script>
+        const toggle = document.getElementById('leasing-toggle');
+        const desc = document.getElementById('leasing-desc');
+
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                desc.innerText = "Місячно: 2400 zł / міс.";
+            } else {
+                desc.innerText = "Тижнево: 600 zł / тиж.";
+            }
+        });
+    </script>
+
+</body>
+</html>
