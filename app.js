@@ -219,3 +219,46 @@ window.addExpense = function(type) {
         saveData(); updateDashboard(); closeMenus();
     }
 }
+
+// === 6. ЗАКРИТТЯ МІСЯЦЯ (АРХІВ) ===
+
+window.closeMonth = function() {
+    if (balances.total === 0 && balances.work === 0 && balances.taxi === 0) {
+        alert("Місяць вже порожній, немає що закривати!");
+        return;
+    }
+
+    if (confirm("Точно закрити місяць? Поточні доходи обнуляться, а результат збережеться в архів (Прогрес авто не обнулиться).")) {
+        
+        // 1. Беремо існуючий архів з пам'яті (або створюємо новий)
+        let archive = JSON.parse(localStorage.getItem('lexus_archive')) || [];
+        
+        // 2. Створюємо запис про поточний місяць
+        const dateStr = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
+        const record = {
+            date: dateStr,
+            total: balances.total,
+            work: balances.work,
+            taxi: balances.taxi,
+            comp: balances.comp,
+            gas: balances.gas
+        };
+        
+        // 3. Зберігаємо в архів
+        archive.push(record);
+        localStorage.setItem('lexus_archive', JSON.stringify(archive));
+
+        // 4. Обнуляємо поточні баланси (КРІМ АВТОМОБІЛЯ)
+        balances.total = 0;
+        balances.work = 0;
+        balances.taxi = 0;
+        balances.comp = 0;
+        balances.gas = 0;
+
+        // Зберігаємо і оновлюємо екран
+        saveData();
+        updateDashboard();
+        
+        alert("Місяць успішно закрито! Баланс оновлено.");
+    }
+};
