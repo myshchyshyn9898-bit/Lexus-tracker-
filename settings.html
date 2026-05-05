@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <div class="flex items-center bg-[#f2f4f7] rounded-[14px] px-3 py-2">
-                    <input type="number" value="24" class="w-10 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
+                    <input type="number" id="rate-hours" value="24" class="w-10 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
                     <span class="text-[12px] font-bold text-[#8e8e93] ml-1">zł</span>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                     </div>
                 </div>
                 <div class="flex items-center bg-[#f2f4f7] rounded-[14px] px-3 py-2">
-                    <input type="number" value="0.80" step="0.1" class="w-12 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
+                    <input type="number" id="rate-km" value="0.80" step="0.1" class="w-12 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
                     <span class="text-[12px] font-bold text-[#8e8e93] ml-1">zł</span>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                     </div>
                 </div>
                 <div class="flex items-center bg-[#f2f4f7] rounded-[14px] px-3 py-2">
-                    <input type="number" value="3.80" step="0.1" class="w-12 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
+                    <input type="number" id="rate-gas" value="3.80" step="0.1" class="w-12 bg-transparent font-black text-[16px] text-right outline-none text-[#1c1c1e]">
                     <span class="text-[12px] font-bold text-[#8e8e93] ml-1">zł</span>
                 </div>
             </div>
@@ -147,7 +147,7 @@
     <div class="fixed bottom-6 left-4 right-4 bg-white/85 backdrop-blur-xl rounded-[32px] floating-nav-shadow border border-white/60 px-6 py-3 flex justify-between items-center z-50">
         
         <!-- Home (Тепер напівпрозорий, бо ми в налаштуваннях) -->
-        <a href="dashboard.html" class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e] opacity-40 active:scale-95 transition-transform">
+        <a href="Dashboard.html" class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e] opacity-40 active:scale-95 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
             <span class="text-[10px] font-extrabold">Home</span>
         </a>
@@ -165,19 +165,8 @@
         </div>
     </div>
 
-    <!-- Мінімальний візуальний скрипт для перемикача -->
-    <script>
-        const toggle = document.getElementById('leasing-toggle');
-        const desc = document.getElementById('leasing-desc');
-
-        toggle.addEventListener('change', function() {
-            if (this.checked) {
-                desc.innerText = "Місячно: 2400 zł / міс.";
-            } else {
-                desc.innerText = "Тижнево: 600 zł / тиж.";
-            }
-        });
-    </script>
+    <!-- ПІДКЛЮЧАЄМО СПІЛЬНИЙ БЕКЕНД/ЛОГІКУ -->
+    <script src="app.js"></script>
 
 </body>
 </html>
