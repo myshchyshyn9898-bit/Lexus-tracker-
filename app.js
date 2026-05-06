@@ -50,6 +50,18 @@ window.payInstallment = function(amount) {
     if (confirm(`Оплатити ${formatMoney(amount)} zł за лізинг?`)) {
         balances.total -= amount;
         balances.carPaid += amount;
+        // Логуємо дату і суму останнього лізингового платежу
+        const now = new Date();
+        const leaseLog = {
+            amount: amount,
+            date: now.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }),
+            time: now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }),
+            carPaidAfter: balances.carPaid
+        };
+        localStorage.setItem('lexus_last_lease', JSON.stringify(leaseLog));
+        // Показуємо крапку
+        const dot = document.getElementById('bell-dot');
+        if (dot) dot.style.display = '';
         saveData();
         updateDashboard();
     }
@@ -290,6 +302,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Swipe to close — ініціалізуємо для всіх меню
+    addSwipeToClose('plusMenu', closeMenus);
+    addSwipeToClose('minusMenu', closeMenus);
+    addSwipeToClose('notifMenu', closeNotifications);
+    addSwipeToClose('photoMenu', closeSettingsMenus);
+
     // Реєстрація Service Worker (PWA)
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
@@ -298,7 +316,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // === 6. МЕНЮ DASHBOARD (+ / -) ===
 
+// === HAPTIC FEEDBACK ===
+function haptic(style = 'light') {
+    if (window.navigator && window.navigator.vibrate) {
+        // Android
+        const patterns = { light: 30, medium: 60, heavy: 100 };
+        navigator.vibrate(patterns[style] || 30);
+    }
+    // iOS — через AudioContext trick (немає прямого API, але iOS PWA вібрує на taptic engine через touch events)
+}
+
+// === SWIPE DOWN TO CLOSE ===
+function addSwipeToClose(menuId, closeFn) {
+    const el = document.getElementById(menuId);
+    if (!el) return;
+    let startY = 0, startX = 0, isDragging = false;
+
+    el.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        el.style.transition = 'none';
+    }, { passive: true });
+
+    el.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const dy = e.touches[0].clientY - startY;
+        const dx = Math.abs(e.touches[0].clientX - startX);
+        if (dy > 0 && dx < 50) {
+            el.style.transform = `translateY(${dy}px)`;
+        }
+    }, { passive: true });
+
+    el.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        el.style.transition = 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)';
+        const dy = e.changedTouches[0].clientY - startY;
+        if (dy > 80) {
+            el.style.transform = 'translateY(150%)';
+            setTimeout(() => {
+                closeFn();
+                el.style.transform = '';
+            }, 300);
+        } else {
+            el.style.transform = '';
+        }
+    }, { passive: true });
+}
+
 window.toggleMenu = function(menuId) {
+    haptic('light');
     document.getElementById('plusMenu').classList.replace('menu-visible', 'menu-hidden');
     document.getElementById('minusMenu').classList.replace('menu-visible', 'menu-hidden');
     document.getElementById(menuId).classList.replace('menu-hidden', 'menu-visible');
@@ -344,6 +412,7 @@ window.addIncome = function(type) {
     else if (type === 'other') { inputId = 'input-other-plus'; let v = parseFloat(document.getElementById(inputId).value); if (v) addedAmount = v; }
 
     if (addedAmount > 0) {
+        haptic('medium');
         balances.total += addedAmount;
         if (type === 'hours' || type === 'other') balances.work += addedAmount;
         if (type === 'km')   balances.comp += addedAmount;
@@ -359,6 +428,7 @@ window.addExpense = function(type) {
     else if (type === 'other') { inputId = 'input-other-minus'; let v = parseFloat(document.getElementById(inputId).value); if (v) subtractedAmount = v; }
 
     if (subtractedAmount > 0) {
+        haptic('medium');
         balances.total -= subtractedAmount;
         balances.gas += subtractedAmount;
         document.getElementById(inputId).value = '';
