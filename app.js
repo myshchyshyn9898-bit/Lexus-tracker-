@@ -412,3 +412,189 @@ window.resetApp = function() {
         }
     }
 };
+
+// === 11. СПОВІЩЕННЯ ===
+
+function buildNotifications() {
+    const items = [];
+    const remaining = CAR_TOTAL - balances.carPaid;
+    const stepAmount = settings.isMonthlyLease ? 2400 : 600;
+    const periodName = settings.isMonthlyLease ? 'місяць' : 'тиждень';
+    const payments = buildPaymentSchedule();
+
+    // 1. АВТО ВИКУПЛЕНО
+    if (remaining <= 0) {
+        items.push({ type: 'success', icon: '🎉', title: 'Автомобіль викуплений!', desc: 'Lexus CT200h повністю твій.' });
+        return items;
+    }
+
+    // 2. НАСТУПНИЙ ПЛАТІЖ
+    if (payments.length > 0) {
+        const nextAmount = payments[0];
+        const isLast = payments.length === 1;
+        const nextDate = new Date();
+        nextDate.setDate(nextDate.getDate() + (settings.isMonthlyLease ? 30 : 7));
+        const dateStr = formatDateUa(nextDate);
+        items.push({
+            type: isLast ? 'final' : 'info',
+            icon: isLast ? '🏁' : '🗓',
+            title: isLast ? `Фінальний платіж — ${formatMoney(nextAmount)} zł` : `Наступний платіж — ${formatMoney(nextAmount)} zł`,
+            desc: `До ${dateStr} (залишилось ${payments.length} виплат)`
+        });
+    }
+
+    // 3. ПОПЕРЕДЖЕННЯ — не вистачає на платіж
+    if (payments.length > 0 && balances.total < payments[0]) {
+        const deficit = payments[0] - balances.total;
+        items.push({
+            type: 'warn',
+            icon: '⚠️',
+            title: 'Не вистачає на платіж',
+            desc: `Потрібно ще ${formatMoney(deficit)} zł. Поточний баланс: ${formatMoney(balances.total)} zł`
+        });
+    } else if (payments.length > 0) {
+        items.push({
+            type: 'success',
+            icon: '✅',
+            title: 'Баланс достатній',
+            desc: `${formatMoney(balances.total)} zł — вистачає на наступний платіж`
+        });
+    }
+
+    // 4. ПІДСУМОК МІСЯЦЯ
+    const totalIncome = balances.work + balances.taxi + balances.comp;
+    items.push({
+        type: 'stat',
+        icon: '📊',
+        title: 'Підсумок цього місяця',
+        desc: `Зароблено: +${formatMoney(totalIncome)} zł · Газ: -${formatMoney(balances.gas)} zł · Чистий баланс: ${formatMoney(balances.total)} zł`
+    });
+
+    // 5. ПРОГРЕС АВТО
+    const percent = Math.round((balances.carPaid / CAR_TOTAL) * 100);
+    const paidMonths = Math.floor((balances.carPaid - 10000) / (settings.isMonthlyLease ? 2400 : 600));
+    items.push({
+        type: 'car',
+        icon: '🚗',
+        title: `Авто: ${percent}% викуплено`,
+        desc: `Сплачено ${formatMoney(balances.carPaid)} zł з ${formatMoney(CAR_TOTAL)} zł · Залишок: ${formatMoney(remaining)} zł`
+    });
+
+    // 6. ОСТАННІ ДІЇ з localStorage
+    const lastActions = JSON.parse(localStorage.getItem('lexus_actions')) || [];
+    if (lastActions.length > 0) {
+        items.push({ type: 'divider', title: 'Останні дії' });
+        lastActions.slice(-5).reverse().forEach(a => {
+            items.push({ type: 'action', icon: a.sign === '+' ? '💰' : '🔻', title: a.label, desc: a.sign + formatMoney(a.amount) + ' zł · ' + a.time });
+        });
+    }
+
+    return items;
+}
+
+function renderNotifications() {
+    const container = document.getElementById('notif-content');
+    if (!container) return;
+    const items = buildNotifications();
+    container.innerHTML = '';
+
+    const colors = {
+        info:    { bg: '#f0f4ff', text: '#4285f4' },
+        warn:    { bg: '#fff8e6', text: '#fbbc04' },
+        success: { bg: '#e2f5ec', text: '#20b26c' },
+        final:   { bg: '#fff0f0', text: '#ff5252' },
+        stat:    { bg: '#f2f4f7', text: '#1c1c1e' },
+        car:     { bg: '#f0f4ff', text: '#4285f4' },
+        action:  { bg: '#f9f9f9', text: '#1c1c1e' },
+        divider: null
+    };
+
+    items.forEach(item => {
+        if (item.type === 'divider') {
+            container.insertAdjacentHTML('beforeend', `
+                <p class="text-[10px] font-extrabold text-[#8e8e93] uppercase tracking-wider pt-2 px-1">${item.title}</p>`);
+            return;
+        }
+        const c = colors[item.type] || colors.stat;
+        container.insertAdjacentHTML('beforeend', `
+            <div class="rounded-[20px] p-4 flex items-start gap-3" style="background:${c.bg}">
+                <span class="text-[20px] leading-none mt-0.5">${item.icon}</span>
+                <div>
+                    <p class="font-black text-[13px] text-[#1c1c1e] leading-snug">${item.title}</p>
+                    <p class="text-[11px] font-bold mt-0.5" style="color:${c.text}">${item.desc}</p>
+                </div>
+            </div>`);
+    });
+}
+
+window.openNotifications = function() {
+    renderNotifications();
+    document.getElementById('notifMenu').classList.replace('menu-hidden', 'menu-visible');
+    document.getElementById('overlay-notif').classList.replace('overlay-hidden', 'overlay-visible');
+    // Прибираємо червону крапку
+    const dot = document.getElementById('bell-dot');
+    if (dot) dot.style.display = 'none';
+    localStorage.setItem('lexus_notif_seen', Date.now());
+};
+
+window.closeNotifications = function() {
+    document.getElementById('notifMenu').classList.replace('menu-visible', 'menu-hidden');
+    document.getElementById('overlay-notif').classList.replace('overlay-visible', 'overlay-hidden');
+};
+
+// Логування дій для "Останні дії"
+function logAction(label, amount, sign) {
+    const actions = JSON.parse(localStorage.getItem('lexus_actions')) || [];
+    const now = new Date();
+    const time = now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) + ' ' +
+                 now.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' });
+    actions.push({ label, amount, sign, time });
+    // Зберігаємо тільки останні 20
+    if (actions.length > 20) actions.splice(0, actions.length - 20);
+    localStorage.setItem('lexus_actions', JSON.stringify(actions));
+}
+
+// Перевизначаємо addIncome і addExpense щоб логувати дії
+const _origAddIncome = window.addIncome;
+window.addIncome = function(type) {
+    const labels = { hours: 'Робота (год.)', km: 'Компенс. км', taxi: 'Таксі', other: 'Інше (+)' };
+    const inputIds = { hours: 'input-hours', km: 'input-km', taxi: 'input-taxi', other: 'input-other-plus' };
+    const rates = { hours: settings.hourlyRate, km: settings.kmRate, taxi: 1, other: 1 };
+    const inputEl = document.getElementById(inputIds[type]);
+    const v = parseFloat(inputEl ? inputEl.value : 0);
+    if (v > 0) {
+        const amt = (type === 'hours' || type === 'km') ? v * rates[type] : v;
+        logAction(labels[type], amt, '+');
+        // Показуємо крапку знову бо є нова подія
+        const dot = document.getElementById('bell-dot');
+        if (dot) dot.style.display = '';
+    }
+    _origAddIncome(type);
+};
+
+const _origAddExpense = window.addExpense;
+window.addExpense = function(type) {
+    const labels = { gas: 'Газ (літри)', other: 'Інше (-)' };
+    const inputIds = { gas: 'input-gas-liters', other: 'input-other-minus' };
+    const inputEl = document.getElementById(inputIds[type]);
+    const v = parseFloat(inputEl ? inputEl.value : 0);
+    if (v > 0) {
+        const amt = type === 'gas' ? v * settings.gasPrice : v;
+        logAction(labels[type], amt, '-');
+        const dot = document.getElementById('bell-dot');
+        if (dot) dot.style.display = '';
+    }
+    _origAddExpense(type);
+};
+
+// Перевірка при завантаженні — показати крапку якщо є нові події
+(function checkBellDot() {
+    const seen = parseInt(localStorage.getItem('lexus_notif_seen') || '0');
+    const actions = JSON.parse(localStorage.getItem('lexus_actions')) || [];
+    // Показуємо крапку якщо є дії після останнього відкриття або якщо не вистачає на платіж
+    const payments = buildPaymentSchedule();
+    const hasWarning = payments.length > 0 && balances.total < payments[0];
+    const hasNewActions = actions.length > 0;
+    const dot = document.getElementById('bell-dot');
+    if (dot && !hasWarning && !hasNewActions) dot.style.display = 'none';
+})();
