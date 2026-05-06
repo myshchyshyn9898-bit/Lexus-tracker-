@@ -2,25 +2,36 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lexus Tracker PRO - Налаштування</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>LexusTracker — Налаштування</title>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff4b4b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="LexusTracker">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         .modern-shadow { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05); }
         .floating-nav-shadow { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12); }
-        
-        /* Стиль для кастомного перемикача (Toggle) */
         .toggle-checkbox:checked { right: 0; border-color: #20b26c; }
         .toggle-checkbox:checked + .toggle-label { background-color: #20b26c; }
         .toggle-checkbox { right: 4px; z-index: 1; border-color: #e5e7eb; transition: all 0.3s; }
         .toggle-label { background-color: #e5e7eb; transition: all 0.3s; }
+        .menu-hidden { transform: translateY(150%); opacity: 0; pointer-events: none; }
+        .menu-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        .overlay-hidden { opacity: 0; pointer-events: none; }
+        .overlay-visible { opacity: 1; pointer-events: auto; }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-[#f4f5f8] min-h-screen text-[#1c1c1e] pb-40">
 
     <div class="px-4 pt-4">
-        
+
         <!-- ШАПКА -->
         <div class="flex items-center gap-2 mb-8 pt-2">
             <h1 class="text-[26px] font-black tracking-tight text-[#1c1c1e]">Налаштування</h1>
@@ -30,25 +41,32 @@
         <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Автомобіль</h3>
         <div class="bg-white rounded-[24px] p-5 mb-6 modern-shadow border border-white flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <!-- Мініатюра поточного фото -->
+                <!-- Мініатюра — динамічна через app.js -->
                 <div class="w-16 h-16 rounded-[14px] bg-gray-200 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=200&auto=format&fit=crop" alt="Lexus" class="w-full h-full object-cover">
+                    <img id="settings-car-thumb"
+                         src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=200&auto=format&fit=crop"
+                         alt="Lexus" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <p class="font-black text-[16px]">Lexus CT200h</p>
                     <p class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Змінити обкладинку</p>
                 </div>
             </div>
-            <!-- Кнопка завантаження -->
-            <button class="bg-[#f2f4f7] text-[#1c1c1e] w-10 h-10 rounded-[12px] flex items-center justify-center active:scale-95 transition-transform">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <!-- Кнопка — тепер з onclick -->
+            <button onclick="toggleSettingsMenu('photoMenu')"
+                    class="bg-[#f2f4f7] text-[#1c1c1e] w-10 h-10 rounded-[12px] flex items-center justify-center active:scale-95 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
             </button>
         </div>
 
         <!-- 2. ТАРИФИ ТА ЦІНИ -->
         <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Тарифи та Ставки</h3>
         <div class="bg-white rounded-[24px] p-5 mb-6 modern-shadow border border-white space-y-5">
-            
+
             <!-- Ставка за годину -->
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -101,7 +119,7 @@
             </div>
         </div>
 
-        <!-- 3. ЛІЗИНГ (Перемикач графіка) -->
+        <!-- 3. ЛІЗИНГ -->
         <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Графік Лізингу</h3>
         <div class="bg-white rounded-[24px] p-5 mb-6 modern-shadow border border-white">
             <div class="flex items-center justify-between mb-4">
@@ -109,23 +127,20 @@
                     <p class="font-black text-[16px]">Режим оплати</p>
                     <p id="leasing-desc" class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Тижнево: 600 zł / тиж.</p>
                 </div>
-                
-                <!-- Перемикач (iOS style toggle) -->
                 <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
                     <input type="checkbox" name="toggle" id="leasing-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
                     <label for="leasing-toggle" class="toggle-label block overflow-hidden h-6 rounded-full cursor-pointer"></label>
                 </div>
             </div>
-            
             <div class="bg-[#fff8e6] text-[#fbbc04] p-3 rounded-[16px] flex items-start gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" class="mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                <p class="text-[11px] font-bold">Зміна режиму перерахує всі майбутні платежі на головному екрані (2400 zł/міс).</p>
+                <p class="text-[11px] font-bold">Зміна режиму перераховує всі майбутні платежі. Перший внесок 10 000 zł вже враховано.</p>
             </div>
         </div>
 
         <!-- 4. АРХІВ ТА ДАНІ -->
         <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Дані</h3>
-        <div class="space-y-3">
+        <div class="space-y-3 mb-4">
             <a href="archive.html" class="block w-full bg-white rounded-[24px] p-5 modern-shadow border border-white active:scale-95 transition-transform">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -140,35 +155,45 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </a>
+
+            <!-- 5. СКИДАННЯ -->
+            <button onclick="resetApp()" class="w-full bg-[#fff0f0] rounded-[24px] p-5 modern-shadow border border-[#ff5252]/10 active:scale-95 transition-transform text-left">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-[#ff5252]/10 w-10 h-10 rounded-[12px] flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#ff5252" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-3.5"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-black text-[16px] text-[#ff5252]">Скинути додаток</p>
+                            <p class="text-[11px] font-bold text-[#ff5252]/60 mt-0.5">Видалити всі дані (незворотно)</p>
+                        </div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff5252" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </button>
         </div>
 
+    </div>
 
-    <!-- ПЛАВАЮЧА НАВІГАЦІЯ (Settings активний) -->
+    <!-- ПЛАВАЮЧА НАВІГАЦІЯ -->
     <div class="fixed bottom-6 left-4 right-4 bg-white/85 backdrop-blur-xl rounded-[32px] floating-nav-shadow border border-white/60 px-6 py-3 flex justify-between items-center z-50">
-        
-        <!-- Home (Тепер напівпрозорий, бо ми в налаштуваннях) -->
         <a href="Dashboard.html" class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e] opacity-40 active:scale-95 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
             <span class="text-[10px] font-extrabold">Home</span>
         </a>
-
-        <!-- Кнопки - та + (Тут вони можуть бути вимкнені або повертати на головну) -->
         <div class="flex gap-3 opacity-50 grayscale pointer-events-none">
             <div class="w-12 h-12 bg-[#fff0f0] text-[#ff5252] rounded-[18px] flex items-center justify-center text-3xl font-bold">-</div>
             <div class="w-12 h-12 bg-[#ff5252] text-white rounded-[18px] flex items-center justify-center text-3xl font-bold">+</div>
         </div>
-
-        <!-- Settings (Тепер АКТИВНИЙ, без opacity) -->
         <div class="flex flex-col items-center gap-1 w-12 text-[#1c1c1e]">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             <span class="text-[10px] font-extrabold text-[#1c1c1e]">Settings</span>
         </div>
     </div>
 
-    <!-- ПІДКЛЮЧАЄМО СПІЛЬНИЙ БЕКЕНД/ЛОГІКУ -->
     <script src="app.js"></script>
 
-        <!-- OVERLAY ДЛЯ НАЛАШТУВАНЬ -->
+    <!-- OVERLAY ДЛЯ МЕНЮ ФОТО -->
     <div id="overlay-settings" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 overlay-hidden transition-opacity duration-300" onclick="closeSettingsMenus()"></div>
 
     <!-- ПОП-АП МЕНЮ ФОТО -->
@@ -178,14 +203,18 @@
             <div class="flex items-center gap-3 bg-[#f2f4f7] p-3 rounded-[20px] border border-white">
                 <div class="flex-1">
                     <div class="text-[10px] font-bold text-[#8e8e93] uppercase tracking-wider pl-1">Посилання (URL)</div>
-                    <input type="text" id="popup-input-photo" class="w-full bg-transparent font-bold text-[14px] text-[#1c1c1e] outline-none mt-1 pl-1" placeholder="https://...">
+                    <!-- ID виправлено: input-car-image (відповідає app.js) -->
+                    <input type="text" id="input-car-image"
+                           class="w-full bg-transparent font-bold text-[14px] text-[#1c1c1e] outline-none mt-1 pl-1"
+                           placeholder="https://...">
                 </div>
             </div>
-            <button onclick="savePhotoUrl()" class="w-full py-4 bg-[#20b26c] text-white rounded-[20px] font-black text-[14px] uppercase tracking-wider active:scale-95 transition-transform shadow-md shadow-green-500/30">
-                Зберегти фото
+            <button onclick="savePhotoUrl()"
+                    class="w-full py-4 bg-[#20b26c] text-white rounded-[20px] font-black text-[14px] uppercase tracking-wider active:scale-95 transition-transform shadow-md shadow-green-500/30">
+                Зберегти фото ✓
             </button>
         </div>
     </div>
-        
+
 </body>
 </html>

@@ -2,8 +2,15 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Архів - Lexus Tracker PRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>LexusTracker — Архів</title>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff4b4b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="LexusTracker">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -13,10 +20,10 @@
 <body class="bg-[#f4f5f8] min-h-screen text-[#1c1c1e] pb-10">
 
     <div class="px-4 pt-4">
-        
-        <!-- ШАПКА -->
+
+        <!-- ШАПКА — кнопка "Назад" веде на Dashboard (виправлено) -->
         <div class="flex items-center gap-4 mb-8 pt-2">
-            <a href="settings.html" class="w-10 h-10 bg-white rounded-[14px] modern-shadow flex items-center justify-center border border-gray-100 active:scale-95 transition-transform">
+            <a href="Dashboard.html" class="w-10 h-10 bg-white rounded-[14px] modern-shadow flex items-center justify-center border border-gray-100 active:scale-95 transition-transform">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1c1c1e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </a>
             <div>
@@ -25,15 +32,11 @@
             </div>
         </div>
 
-        <!-- СПИСОК АРХІВУ (Сюди app.js вставлятиме картки) -->
-        <div id="archive-list" class="space-y-4">
-            <!-- Тут з'являться збережені місяці -->
-        </div>
+        <!-- СПИСОК АРХІВУ (app.js заповнює) -->
+        <div id="archive-list" class="space-y-4"></div>
 
     </div>
 
-    <!-- ПІДКЛЮЧАЄМО СПІЛЬНИЙ БЕКЕНД/ЛОГІКУ -->
     <script src="app.js"></script>
-
 </body>
 </html>
