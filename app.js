@@ -5,7 +5,6 @@ let balances = JSON.parse(localStorage.getItem('lexus_balances')) || {
     taxi: 450.00,
     comp: 280.00,
     gas: 280.00,
-    // Тепер викуп авто зберігається в пам'яті і росте!
     carTotal: 35000,
     carPaid: 1000 
 };
@@ -14,8 +13,12 @@ let settings = JSON.parse(localStorage.getItem('lexus_settings')) || {
     hourlyRate: 24,
     kmRate: 0.80,
     gasPrice: 3.80,
-    isMonthlyLease: false
+    isMonthlyLease: false,
+    carImageUrl: "" // Нове поле для фото
 };
+
+const CAR_TOTAL = 35000;
+const CAR_PAID = 1000; 
 
 let currentLeasePage = 1; 
 let maxLeasePages = 1;    
@@ -47,11 +50,10 @@ window.payInstallment = function(amount) {
     }
 
     if (confirm(`Оплатити ${amount} zł за лізинг?`)) {
-        balances.total -= amount;    // Списуємо з профіту
-        balances.carPaid += amount; // Додаємо до викупу авто
+        balances.total -= amount;    
+        balances.carPaid += amount; 
         saveData();
         updateDashboard();
-        // Анімація успіху (можна додати звук пізніше)
     }
 };
 
@@ -65,7 +67,7 @@ function renderLeasingList() {
     listContainer.innerHTML = ''; 
     titleContainer.innerText = `Виплати Лізинг (Стор. ${currentLeasePage})`;
 
-    const remainingDebt = balances.carTotal - balances.carPaid;
+    const remainingDebt = CAR_TOTAL - balances.carPaid;
     const stepAmount = settings.isMonthlyLease ? 2400 : 600;
     const periodName = settings.isMonthlyLease ? "Місяць" : "Тиждень";
     
@@ -92,7 +94,6 @@ function renderLeasingList() {
         date.setDate(date.getDate() + (currentNum * (settings.isMonthlyLease ? 30 : 7)));
         const dateStr = formatDateUa(date);
 
-        // КНОПКА "ОПЛАТИТИ" ТІЛЬКИ ДЛЯ ПЕРШОГО ПЛАТЕЖУ НА ПЕРШІЙ СТОРІНЦІ
         const showPayButton = (currentNum === 1 && currentLeasePage === 1);
 
         const html = `
@@ -123,11 +124,11 @@ function renderLeasingList() {
 window.nextLeasePage = function() { if (currentLeasePage < maxLeasePages) { currentLeasePage++; renderLeasingList(); } };
 window.prevLeasePage = function() { if (currentLeasePage > 1) { currentLeasePage--; renderLeasingList(); } };
 
-// === 4. РЕНДЕР АРХІВУ (ХІРУРГІЧНО ДОДАНО) ===
+// === 4. РЕНДЕР АРХІВУ ===
 
 function renderArchive() {
     const container = document.getElementById('archive-list');
-    if (!container) return; // Працює тільки на сторінці archive.html
+    if (!container) return; 
 
     const archive = JSON.parse(localStorage.getItem('lexus_archive')) || [];
     container.innerHTML = '';
@@ -142,7 +143,6 @@ function renderArchive() {
         return;
     }
 
-    // Показуємо найновіші записи зверху
     [...archive].reverse().forEach(record => {
         const html = `
             <div class="bg-white rounded-[28px] p-5 modern-shadow border border-white">
@@ -173,19 +173,27 @@ function renderArchive() {
 function updateDashboard() {
     if (!document.getElementById('val-total')) return;
 
-    // 1. Гроші на плитках
+    // Гроші
     document.getElementById('val-total').innerText = formatMoney(balances.total) + '.00 zł';
     document.getElementById('val-work').innerText = '+ ' + formatMoney(balances.work);
     document.getElementById('val-taxi').innerText = '+ ' + formatMoney(balances.taxi);
     document.getElementById('val-comp').innerText = '+ ' + formatMoney(balances.comp);
     document.getElementById('val-gas').innerText = '- ' + formatMoney(balances.gas);
 
-    // 2. Прогрес-бар авто
-    const percent = Math.round((balances.carPaid / balances.carTotal) * 100);
+    // Прогрес-бар авто
+    const percent = Math.round((balances.carPaid / CAR_TOTAL) * 100);
     document.getElementById('car-paid-text').innerText = formatMoney(balances.carPaid);
-    document.getElementById('car-total-text').innerText = `/ ${formatMoney(balances.carTotal / 1000)}k zł`;
+    document.getElementById('car-total-text').innerText = `/ ${formatMoney(CAR_TOTAL / 1000)}k zł`;
     document.getElementById('car-percent-badge').innerText = percent + '%';
     document.getElementById('car-progress-bar').style.width = percent + '%';
+
+    // Оновлення фото авто
+    const carImgElement = document.getElementById('car-image');
+    if (carImgElement) {
+        // Якщо є збережене посилання, ставимо його, інакше дефолтне фото
+        const defaultImg = "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=800&auto=format&fit=crop";
+        carImgElement.src = settings.carImageUrl && settings.carImageUrl.trim() !== "" ? settings.carImageUrl : defaultImg;
+    }
 
     renderLeasingList();
 }
@@ -196,6 +204,12 @@ function updateSettingsUI() {
     document.getElementById('rate-km').value = settings.kmRate;
     document.getElementById('rate-gas').value = settings.gasPrice;
 
+    // Підтягуємо фото
+    const carImageInput = document.getElementById('input-car-image');
+    if (carImageInput) {
+        carImageInput.value = settings.carImageUrl || "";
+    }
+
     const toggle = document.getElementById('leasing-toggle');
     const desc = document.getElementById('leasing-desc');
     toggle.checked = settings.isMonthlyLease;
@@ -205,13 +219,22 @@ function updateSettingsUI() {
 document.addEventListener('DOMContentLoaded', () => {
     updateDashboard();
     updateSettingsUI();
-    renderArchive(); // Виклик функції рендеру архіву
+    renderArchive(); 
     
-    // Слухачі в налаштуваннях
     if (document.getElementById('rate-hours')) {
         document.getElementById('rate-hours').addEventListener('input', (e) => { settings.hourlyRate = parseFloat(e.target.value) || 0; saveData(); });
         document.getElementById('rate-km').addEventListener('input', (e) => { settings.kmRate = parseFloat(e.target.value) || 0; saveData(); });
         document.getElementById('rate-gas').addEventListener('input', (e) => { settings.gasPrice = parseFloat(e.target.value) || 0; saveData(); });
+        
+        // Слухач для поля фотографії
+        const carImageInput = document.getElementById('input-car-image');
+        if (carImageInput) {
+            carImageInput.addEventListener('input', (e) => {
+                settings.carImageUrl = e.target.value;
+                saveData();
+            });
+        }
+
         document.getElementById('leasing-toggle').addEventListener('change', (e) => {
             settings.isMonthlyLease = e.target.checked;
             document.getElementById('leasing-desc').innerText = settings.isMonthlyLease ? "Місячно: 2400 zł / міс." : "Тижнево: 600 zł / тиж.";
@@ -276,10 +299,8 @@ window.closeMonth = function() {
 
     if (confirm("Точно закрити місяць? Поточні доходи обнуляться, а результат збережеться в архів (Прогрес авто не обнулиться).")) {
         
-        // 1. Беремо існуючий архів з пам'яті (або створюємо новий)
         let archive = JSON.parse(localStorage.getItem('lexus_archive')) || [];
         
-        // 2. Створюємо запис про поточний місяць
         const dateStr = new Date().toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         const record = {
             date: dateStr,
@@ -290,18 +311,15 @@ window.closeMonth = function() {
             gas: balances.gas
         };
         
-        // 3. Зберігаємо в архів
         archive.push(record);
         localStorage.setItem('lexus_archive', JSON.stringify(archive));
 
-        // 4. Обнуляємо поточні баланси (КРІМ АВТОМОБІЛЯ)
         balances.total = 0;
         balances.work = 0;
         balances.taxi = 0;
         balances.comp = 0;
         balances.gas = 0;
 
-        // Зберігаємо і оновлюємо екран
         saveData();
         updateDashboard();
         
