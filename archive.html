@@ -11,11 +11,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="LexusTracker">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        .modern-shadow { box-shadow: 0 16px 32px rgba(0, 0, 0, 0.04); }
-    </style>
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+
+    <script>
+        // Ініціалізуємо тему ДО рендеру — без flash
+        (function() {
+            const t = localStorage.getItem('lexus_theme');
+            if (t) document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
 </head>
 <body class="bg-[#f4f5f8] min-h-screen text-[#1c1c1e] pb-10">
 

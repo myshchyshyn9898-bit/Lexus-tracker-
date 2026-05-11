@@ -11,5 +11,35 @@
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
     { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Додати години роботи",
+      "short_name": "Години",
+      "description": "Швидко додати робочі години",
+      "url": "./Dashboard.html?action=add-hours",
+      "icons": [{ "src": "sc-hours.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Додати таксі",
+      "short_name": "Таксі",
+      "description": "Додати дохід з таксі",
+      "url": "./Dashboard.html?action=add-taxi",
+      "icons": [{ "src": "sc-taxi.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Додати газ",
+      "short_name": "Газ",
+      "description": "Записати витрати на газ",
+      "url": "./Dashboard.html?action=add-gas",
+      "icons": [{ "src": "sc-gas.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Оплатити лізинг",
+      "short_name": "Лізинг",
+      "description": "Швидка оплата лізингового платежу",
+      "url": "./Dashboard.html?action=pay-lease",
+      "icons": [{ "src": "sc-lease.png", "sizes": "192x192", "type": "image/png" }]
+    }
   ]
 }

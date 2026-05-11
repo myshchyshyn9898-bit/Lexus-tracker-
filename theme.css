@@ -1,0 +1,221 @@
+/* ============================================
+   LexusTracker — Система тем (Світла / Темна)
+   Зберігається в localStorage: lexus_theme
+   ============================================ */
+
+/* === CSS ЗМІННІ — Світла тема (дефолт) === */
+:root {
+    --bg-page:        #f4f5f8;
+    --bg-card:        #ffffff;
+    --bg-input:       #f2f4f7;
+    --bg-red-tint:    #fff0f0;
+    --bg-green-tint:  #e2f5ec;
+    --bg-blue-tint:   #f0f4ff;
+    --bg-yellow-tint: #fff8e6;
+    --bg-gray-tint:   #f9f9f9;
+
+    --text-primary:   #1c1c1e;
+    --text-secondary: #8e8e93;
+    --border-card:    rgba(255,255,255,1);
+    --border-subtle:  rgba(0,0,0,0.06);
+
+    --nav-bg:         rgba(255,255,255,0.85);
+    --overlay-bg:     rgba(0,0,0,0.20);
+    --shadow-card:    rgba(0,0,0,0.04);
+    --shadow-nav:     rgba(0,0,0,0.12);
+}
+
+/* === CSS ЗМІННІ — Темна тема === */
+[data-theme="dark"] {
+    --bg-page:        #111113;
+    --bg-card:        #1c1c1e;
+    --bg-input:       #2c2c2e;
+    --bg-red-tint:    #2a1212;
+    --bg-green-tint:  #0d2018;
+    --bg-blue-tint:   #0d1526;
+    --bg-yellow-tint: #241e0a;
+    --bg-gray-tint:   #2c2c2e;
+
+    --text-primary:   #f2f2f7;
+    --text-secondary: #636366;
+    --border-card:    rgba(255,255,255,0.07);
+    --border-subtle:  rgba(255,255,255,0.07);
+
+    --nav-bg:         rgba(28,28,30,0.90);
+    --overlay-bg:     rgba(0,0,0,0.50);
+    --shadow-card:    rgba(0,0,0,0.30);
+    --shadow-nav:     rgba(0,0,0,0.50);
+}
+
+/* === Системна тема як fallback (якщо не вибрано вручну) === */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
+        --bg-page:        #111113;
+        --bg-card:        #1c1c1e;
+        --bg-input:       #2c2c2e;
+        --bg-red-tint:    #2a1212;
+        --bg-green-tint:  #0d2018;
+        --bg-blue-tint:   #0d1526;
+        --bg-yellow-tint: #241e0a;
+        --bg-gray-tint:   #2c2c2e;
+        --text-primary:   #f2f2f7;
+        --text-secondary: #636366;
+        --border-card:    rgba(255,255,255,0.07);
+        --border-subtle:  rgba(255,255,255,0.07);
+        --nav-bg:         rgba(28,28,30,0.90);
+        --overlay-bg:     rgba(0,0,0,0.50);
+        --shadow-card:    rgba(0,0,0,0.30);
+        --shadow-nav:     rgba(0,0,0,0.50);
+    }
+}
+
+/* ============================================
+   ТЕМНА ТЕМА: Перевизначення Tailwind класів
+   ============================================ */
+
+/* --- Фон сторінки --- */
+[data-theme="dark"] body,
+[data-theme="dark"] .bg-\[\#f4f5f8\],
+[data-theme="dark"] .min-h-screen {
+    background-color: var(--bg-page) !important;
+}
+
+/* --- Картки (bg-white) --- */
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-white\/95,
+[data-theme="dark"] .bg-white\/85 {
+    background-color: var(--bg-card) !important;
+}
+
+/* --- Backdrop blur меню і nav --- */
+[data-theme="dark"] .backdrop-blur-xl,
+[data-theme="dark"] .backdrop-blur-2xl {
+    background-color: var(--nav-bg) !important;
+}
+
+/* --- Текст основний --- */
+[data-theme="dark"] .text-\[\#1c1c1e\] {
+    color: var(--text-primary) !important;
+}
+
+/* --- Текст другорядний --- */
+[data-theme="dark"] .text-\[\#8e8e93\] {
+    color: var(--text-secondary) !important;
+}
+
+/* --- Фон інпутів і кнопок --- */
+[data-theme="dark"] .bg-\[\#f2f4f7\] {
+    background-color: var(--bg-input) !important;
+}
+
+/* --- Тінті кольорів --- */
+[data-theme="dark"] .bg-\[\#fff0f0\] {
+    background-color: var(--bg-red-tint) !important;
+}
+[data-theme="dark"] .bg-\[\#e2f5ec\] {
+    background-color: var(--bg-green-tint) !important;
+}
+[data-theme="dark"] .bg-\[\#f0f4ff\] {
+    background-color: var(--bg-blue-tint) !important;
+}
+[data-theme="dark"] .bg-\[\#fff8e6\] {
+    background-color: var(--bg-yellow-tint) !important;
+}
+[data-theme="dark"] .bg-\[\#f9f9f9\] {
+    background-color: var(--bg-gray-tint) !important;
+}
+
+/* --- Бордери карток --- */
+[data-theme="dark"] .border-white {
+    border-color: var(--border-card) !important;
+}
+[data-theme="dark"] .border-gray-100 {
+    border-color: var(--border-subtle) !important;
+}
+
+/* --- Тіні --- */
+[data-theme="dark"] .modern-shadow {
+    box-shadow: 0 16px 32px var(--shadow-card) !important;
+}
+[data-theme="dark"] .floating-nav-shadow {
+    box-shadow: 0 16px 40px var(--shadow-nav) !important;
+}
+
+/* --- Оверлей --- */
+[data-theme="dark"] .bg-black\/20 {
+    background-color: var(--overlay-bg) !important;
+}
+
+/* --- Інпути --- */
+[data-theme="dark"] input,
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="number"] {
+    color: var(--text-primary) !important;
+    background-color: transparent !important;
+}
+[data-theme="dark"] input::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+/* --- Логотип --- */
+[data-theme="dark"] h1.text-\[\#1c1c1e\],
+[data-theme="dark"] .tracking-tight.text-\[\#1c1c1e\] {
+    color: var(--text-primary) !important;
+}
+
+/* --- Кнопка дзвіночка --- */
+[data-theme="dark"] #bell-btn {
+    background-color: var(--bg-card) !important;
+}
+[data-theme="dark"] #bell-btn svg {
+    stroke: var(--text-primary) !important;
+}
+
+/* --- Нав бар іконки --- */
+[data-theme="dark"] .floating-nav-shadow svg {
+    stroke: var(--text-primary);
+}
+[data-theme="dark"] .floating-nav-shadow span {
+    color: var(--text-primary);
+}
+
+/* --- Лізинг дати --- */
+[data-theme="dark"] .bg-\[\#f2f4f7\].rounded-\[10px\] {
+    color: var(--text-primary) !important;
+}
+
+/* --- Архів картки --- */
+[data-theme="dark"] .rounded-\[28px\].bg-white {
+    background-color: var(--bg-card) !important;
+}
+
+/* --- Тогл Settings --- */
+[data-theme="dark"] .toggle-label {
+    background-color: #3a3a3c !important;
+}
+
+/* === КНОПКА ТЕМИ В SETTINGS === */
+.theme-btn-light, .theme-btn-dark, .theme-btn-system {
+    flex: 1;
+    padding: 10px 4px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+.theme-btn-active {
+    background-color: #ff5252;
+    color: #ffffff;
+    border-color: #ff5252;
+}
+.theme-btn-inactive {
+    background-color: var(--bg-input);
+    color: var(--text-secondary);
+}
+[data-theme="dark"] .theme-btn-inactive {
+    background-color: #2c2c2e;
+    color: #636366;
+}

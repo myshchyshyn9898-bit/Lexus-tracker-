@@ -11,22 +11,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="LexusTracker">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        .modern-shadow { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.05); }
-        .floating-nav-shadow { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12); }
-        .toggle-checkbox:checked { right: 0; border-color: #20b26c; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #20b26c; }
-        .toggle-checkbox { right: 4px; z-index: 1; border-color: #e5e7eb; transition: all 0.3s; }
-        .toggle-label { background-color: #e5e7eb; transition: all 0.3s; }
-        .menu-hidden { transform: translateY(150%); opacity: 0; pointer-events: none; }
-        .menu-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
-        .overlay-hidden { opacity: 0; pointer-events: none; }
-        .overlay-visible { opacity: 1; pointer-events: auto; }
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    </style>
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="theme.css">
+
+    <script>
+        // Ініціалізуємо тему ДО рендеру — без flash
+        (function() {
+            const t = localStorage.getItem('lexus_theme');
+            if (t) document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
 </head>
 <body class="bg-[#f4f5f8] min-h-screen text-[#1c1c1e] pb-40">
 
@@ -155,6 +150,94 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </div>
             </a>
+
+
+
+
+        <!-- ТЕМА -->
+        <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Зовнішній вигляд</h3>
+        <div class="bg-white rounded-[24px] p-5 mb-6 modern-shadow border border-white">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-[#f2f4f7] w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#1c1c1e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </div>
+                <div>
+                    <p class="font-black text-[16px] text-[#1c1c1e]">Тема</p>
+                    <p id="theme-current-desc" class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Системна</p>
+                </div>
+            </div>
+            <div class="flex gap-2" id="theme-buttons">
+                <button onclick="setTheme('light')" id="theme-btn-light" class="theme-btn theme-btn-inactive">
+                    ☀️<br>Світла
+                </button>
+                <button onclick="setTheme('dark')" id="theme-btn-dark" class="theme-btn theme-btn-inactive">
+                    🌙<br>Темна
+                </button>
+                <button onclick="setTheme('system')" id="theme-btn-system" class="theme-btn theme-btn-inactive">
+                    📱<br>Системна
+                </button>
+            </div>
+        </div>
+
+        <!-- СПОВІЩЕННЯ -->
+        <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Сповіщення</h3>
+        <div class="bg-white rounded-[24px] p-5 mb-6 modern-shadow border border-white">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button id="notif-toggle-btn" onclick="requestNotifPermission()"
+                            class="bg-[#f2f4f7] w-10 h-10 rounded-[12px] flex items-center justify-center active:scale-95 transition-transform flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#1c1c1e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    </button>
+                    <div>
+                        <p class="font-black text-[16px]">Push-нотифікації</p>
+                        <p id="notif-toggle-desc" class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Нагадування за 2 дні до платежу</p>
+                    </div>
+                </div>
+                <button onclick="requestNotifPermission()"
+                        class="bg-[#ff5252] text-white text-[11px] font-black px-4 py-2 rounded-[12px] active:scale-95 transition-transform">
+                    Увімкнути
+                </button>
+            </div>
+            <div class="mt-4 bg-[#f2f4f7] rounded-[16px] p-3 space-y-1.5">
+                <p class="text-[11px] font-bold text-[#1c1c1e]">📅 За 2 дні до платежу лізингу</p>
+                <p class="text-[11px] font-bold text-[#1c1c1e]">⚠️ Якщо балансу не вистачає</p>
+                <p class="text-[11px] font-bold text-[#1c1c1e]">✅ Коли баланс поповнено достатньо</p>
+                <p class="text-[11px] font-bold text-[#1c1c1e]">🏆 При досягненні 25% / 50% / 75% / 90%</p>
+            </div>
+        </div>
+
+        <!-- БЕКАП ДАНИХ (FIX #4) -->
+        <h3 class="text-[11px] font-bold text-[#8e8e93] uppercase tracking-wider mb-3 px-2">Резервна копія</h3>
+        <div class="space-y-3 mb-6">
+            <button onclick="exportData()" class="w-full bg-white rounded-[24px] p-5 modern-shadow border border-white active:scale-95 transition-transform text-left">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-[#e2f5ec] w-10 h-10 rounded-[12px] flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#20b26c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        </div>
+                        <div>
+                            <p class="font-black text-[16px]">Експорт даних</p>
+                            <p class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Зберегти резервну копію .json</p>
+                        </div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </button>
+            <button onclick="importData()" class="w-full bg-white rounded-[24px] p-5 modern-shadow border border-white active:scale-95 transition-transform text-left">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-[#f0f4ff] w-10 h-10 rounded-[12px] flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#4285f4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        </div>
+                        <div>
+                            <p class="font-black text-[16px]">Імпорт даних</p>
+                            <p class="text-[11px] font-bold text-[#8e8e93] mt-0.5">Відновити з резервної копії</p>
+                        </div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </button>
+        </div>
 
             <!-- 5. СКИДАННЯ -->
             <button onclick="resetApp()" class="w-full bg-[#fff0f0] rounded-[24px] p-5 modern-shadow border border-[#ff5252]/10 active:scale-95 transition-transform text-left">
