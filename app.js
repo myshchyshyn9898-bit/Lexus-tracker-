@@ -6,7 +6,8 @@ let balances = JSON.parse(localStorage.getItem('lexus_balances')) || {
 
 let settings = JSON.parse(localStorage.getItem('lexus_settings')) || {
     hourlyRate: 24, kmRate: 0.80, gasPrice: 3.80,
-    isMonthlyLease: false, carImageUrl: ""
+    isMonthlyLease: false, carImageUrl: "",
+    startDate: ""  // Дата початку відліку (ISO: "2024-01-15")
 };
 
 const CAR_TOTAL = 35000;
@@ -221,6 +222,9 @@ function updateSettingsUI() {
         const defaultImg = "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=200&auto=format&fit=crop";
         settingsCarImg.src = settings.carImageUrl?.trim() || defaultImg;
     }
+    const startDateInput = document.getElementById('input-start-date');
+    if (startDateInput) startDateInput.value = settings.startDate || '';
+    updateStartDateStats();
     const toggle = document.getElementById('leasing-toggle');
     const desc = document.getElementById('leasing-desc');
     if (toggle) {
@@ -238,6 +242,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('rate-hours').addEventListener('input', (e) => { settings.hourlyRate = parseFloat(e.target.value) || 0; saveData(); });
         document.getElementById('rate-km').addEventListener('input', (e) => { settings.kmRate = parseFloat(e.target.value) || 0; saveData(); });
         document.getElementById('rate-gas').addEventListener('input', (e) => { settings.gasPrice = parseFloat(e.target.value) || 0; saveData(); });
+        if (document.getElementById('input-start-date')) {
+            document.getElementById('input-start-date').addEventListener('change', (e) => {
+                settings.startDate = e.target.value;
+                saveData();
+                updateStartDateStats();
+            });
+        }
         document.getElementById('leasing-toggle').addEventListener('change', (e) => {
             settings.isMonthlyLease = e.target.checked;
             document.getElementById('leasing-desc').innerText = settings.isMonthlyLease ? "Місячно: 2400 zł / міс." : "Тижнево: 600 zł / тиж.";
@@ -911,3 +922,70 @@ window.closePayMenu = function() {
         }, 350); // Невелика затримка щоб анімація входу завершилась
     });
 })();
+
+// === 17. ДАТА СТАРТУ ===
+
+function updateStartDateStats() {
+    const el = document.getElementById('start-date-stats');
+    if (!el) return;
+
+    if (!settings.startDate) {
+        el.innerHTML = `<p class="text-[11px] font-bold text-[#8e8e93]">Встанови дату — побачиш статистику з першого дня</p>`;
+        return;
+    }
+
+    const start   = new Date(settings.startDate);
+    const now     = new Date();
+    const diffMs  = now - start;
+    const days    = Math.floor(diffMs / 86400000);
+    const weeks   = Math.floor(days / 7);
+    const months  = Math.floor(days / 30.44);
+
+    // Загальний заробіток з архіву + поточний місяць
+    const archive = JSON.parse(localStorage.getItem('lexus_archive')) || [];
+    const totalEarned = archive.reduce((s, r) => s + (r.total || 0), 0) + balances.total;
+    const totalGas    = archive.reduce((s, r) => s + (r.gas   || 0), 0) + balances.gas;
+    const totalLease  = balances.carPaid - 10000; // мінус перший внесок
+
+    const avgPerMonth = months > 0 ? Math.round(totalEarned / months) : totalEarned;
+    const netProfit   = totalEarned - totalGas - totalLease;
+
+    // Прогноз закриття лізингу
+    const remaining = CAR_TOTAL - balances.carPaid;
+    const monthsLeft = avgPerMonth > 0
+        ? Math.ceil(remaining / (settings.isMonthlyLease ? 2400 : 2400))
+        : null;
+
+    const periodLabel = months >= 1
+        ? `${months} міс.`
+        : `${weeks} тиж.`;
+
+    el.innerHTML = `
+        <div class="grid grid-cols-2 gap-2">
+            <div class="bg-[#f0f4ff] rounded-[14px] p-3">
+                <p class="text-[10px] font-extrabold text-[#4285f4] uppercase tracking-wider">Відслідковую</p>
+                <p class="text-[16px] font-black text-[#1c1c1e] mt-0.5">${periodLabel}</p>
+                <p class="text-[10px] font-bold text-[#8e8e93] mt-0.5">${days} днів</p>
+            </div>
+            <div class="bg-[#e2f5ec] rounded-[14px] p-3">
+                <p class="text-[10px] font-extrabold text-[#20b26c] uppercase tracking-wider">Середній/міс</p>
+                <p class="text-[16px] font-black text-[#1c1c1e] mt-0.5">${formatMoney(avgPerMonth)} zł</p>
+                <p class="text-[10px] font-bold text-[#8e8e93] mt-0.5">за весь час</p>
+            </div>
+            <div class="bg-[#fff0f0] rounded-[14px] p-3">
+                <p class="text-[10px] font-extrabold text-[#ff5252] uppercase tracking-wider">Витрати</p>
+                <p class="text-[16px] font-black text-[#1c1c1e] mt-0.5">${formatMoney(totalGas + totalLease)} zł</p>
+                <p class="text-[10px] font-bold text-[#8e8e93] mt-0.5">газ + лізинг</p>
+            </div>
+            <div class="${netProfit >= 0 ? 'bg-[#e2f5ec]' : 'bg-[#fff0f0]'} rounded-[14px] p-3">
+                <p class="text-[10px] font-extrabold ${netProfit >= 0 ? 'text-[#20b26c]' : 'text-[#ff5252]'} uppercase tracking-wider">Чистий профіт</p>
+                <p class="text-[16px] font-black text-[#1c1c1e] mt-0.5">${netProfit >= 0 ? '+' : ''}${formatMoney(netProfit)} zł</p>
+                <p class="text-[10px] font-bold text-[#8e8e93] mt-0.5">за весь час</p>
+            </div>
+        </div>
+        ${monthsLeft ? `
+        <div class="mt-2 bg-[#f2f4f7] rounded-[14px] p-3 flex items-center gap-2">
+            <span class="text-[16px]">🚗</span>
+            <p class="text-[11px] font-bold text-[#1c1c1e]">Лізинг закриється приблизно через <span class="text-[#ff5252]">${monthsLeft} міс.</span></p>
+        </div>` : ''}`;
+}

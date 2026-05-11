@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lexus-tracker-v6';
+const CACHE_NAME = 'lexus-tracker-v7';
 const ASSETS = [
   './Dashboard.html', './settings.html', './archive.html',
   './app.js', './manifest.json', './tailwind.css', './style.css',
